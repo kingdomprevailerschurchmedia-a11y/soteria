@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../theme/tokens.dart';
+import '../../design_system/design_system.dart';
 
 /// SoteriaChip is a compact element that represents an attribute or action.
 class SoteriaChip extends StatelessWidget {
@@ -21,7 +21,7 @@ class SoteriaChip extends StatelessWidget {
       selected: isSelected,
       onSelected: onSelected,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.s),
+        borderRadius: BorderRadius.circular(SoteriaRadius.s),
       ),
     );
   }
@@ -74,10 +74,10 @@ class SoteriaTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: SoteriaSpacing.s8, vertical: 2),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppRadius.xs),
+        borderRadius: BorderRadius.circular(SoteriaRadius.xs),
         border: Border.all(color: color.withValues(alpha: 0.5)),
       ),
       child: Text(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/design_system/design_system.dart';
 
 /// ComponentPreviewWrapper provides controls to test components in different configurations.
 class ComponentPreviewWrapper extends StatefulWidget {
@@ -25,13 +25,13 @@ class _ComponentPreviewWrapperState extends State<ComponentPreviewWrapper> {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: _isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
+      data: _isDarkMode ? SoteriaTheme.dark : SoteriaTheme.light,
       child: Scaffold(
         appBar: AppBar(
           title: Text('Preview: ${widget.name}'),
           actions: [
             IconButton(
-              icon: Icon(_isDarkMode ? Icons.light_mode : Icons.dark_mode),
+              icon: Icon(_isDarkMode ? SoteriaIcons.visibility : SoteriaIcons.visibilityOff),
               onPressed: () => setState(() => _isDarkMode = !_isDarkMode),
               tooltip: 'Toggle Theme',
             ),

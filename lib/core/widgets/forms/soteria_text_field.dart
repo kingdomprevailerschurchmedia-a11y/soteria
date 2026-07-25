@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
-import '../../theme/tokens.dart';
+import '../../design_system/design_system.dart';
 
 /// SoteriaTextField is a custom input field with consistent styling.
 class SoteriaTextField extends StatelessWidget {
@@ -40,7 +40,7 @@ class SoteriaTextField extends StatelessWidget {
             label!,
             style: Theme.of(context).textTheme.titleSmall,
           ),
-          const SizedBox(height: AppSpacing.s),
+          const SizedBox(height: SoteriaSpacing.s8),
         ],
         TextFormField(
           controller: controller,
@@ -54,21 +54,21 @@ class SoteriaTextField extends StatelessWidget {
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: enabled ? null : Colors.grey.withAlpha(25),
+            fillColor: enabled ? null : Colors.grey.withValues(alpha: 0.1),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppRadius.m),
+              borderRadius: BorderRadius.circular(SoteriaRadius.m),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppRadius.m),
-              borderSide: const BorderSide(color: Colors.grey),
+              borderRadius: BorderRadius.circular(SoteriaRadius.m),
+              borderSide: const BorderSide(color: SoteriaColors.outlineLight),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppRadius.m),
+              borderRadius: BorderRadius.circular(SoteriaRadius.m),
               borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppRadius.m),
-              borderSide: const BorderSide(color: AppColors.danger),
+              borderRadius: BorderRadius.circular(SoteriaRadius.m),
+              borderSide: const BorderSide(color: SoteriaColors.error),
             ),
           ),
         ),
@@ -81,10 +81,11 @@ class SoteriaTextField extends StatelessWidget {
 
 @Preview(name: 'TextField - Default')
 Widget textFieldPreview() {
-  return const MaterialApp(
-    home: Scaffold(
+  return MaterialApp(
+    theme: SoteriaTheme.light,
+    home: const Scaffold(
       body: Padding(
-        padding: EdgeInsets.all(AppSpacing.m),
+        padding: EdgeInsets.all(SoteriaSpacing.s16),
         child: Center(
           child: SoteriaTextField(
             label: 'Email Address',

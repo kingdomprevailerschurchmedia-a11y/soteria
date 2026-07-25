@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
-import '../../theme/tokens.dart';
+import '../../design_system/design_system.dart';
+import '../../utils/app_animations.dart';
 
-/// SoteriaButton is a customizable button component that supports various types.
+/// SoteriaButton is a premium button component with bounce effects and haptics.
 class SoteriaButton extends StatelessWidget {
   const SoteriaButton({
     super.key,
@@ -15,100 +16,129 @@ class SoteriaButton extends StatelessWidget {
     this.width,
   });
 
-  /// Callback when the button is pressed.
   final VoidCallback? onPressed;
-
-  /// The text label to display on the button.
   final String label;
-
-  /// If true, a loading indicator is shown instead of the label.
   final bool isLoading;
-
-  /// If true, the button is visually and functionally disabled.
   final bool isDisabled;
-
-  /// Optional icon to display before the label.
   final IconData? icon;
-
-  /// The visual type of the button.
   final SoteriaButtonType type;
-
-  /// Optional fixed width for the button.
   final double? width;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
-    final Widget content = isLoading
-        ? const SizedBox(
-            height: 20,
-            width: 20,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-            ),
-          )
-        : Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (icon != null) ...[
-                Icon(icon, size: 20),
-                const SizedBox(width: AppSpacing.s),
-              ],
-              Text(label),
-            ],
-          );
-
-    final effectiveOnPressed = (isLoading || isDisabled) ? null : onPressed;
-
-    return SizedBox(
-      width: width,
-      height: 48,
-      child: _buildButton(theme, content, effectiveOnPressed),
+    return AppAnimations.bounceClick(
+      onTap: onPressed ?? () {},
+      isDisabled: isDisabled || isLoading || onPressed == null,
+      child: SizedBox(
+        width: width,
+        height: 56, // Taller for premium feel
+        child: DecoratedBox(
+          decoration: _getDecoration(context),
+          child: Center(
+            child: _buildContent(context),
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildButton(ThemeData theme, Widget content, VoidCallback? onPressed) {
+  Decoration _getDecoration(BuildContext context) {
+    if (isDisabled) {
+      return BoxDecoration(
+        color: Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(SoteriaRadius.m),
+      );
+    }
+
     switch (type) {
-      case SoteriaButtonType.primary:
-        return ElevatedButton(
-          onPressed: onPressed,
-          child: content,
+      case SoteriaButtonType.reward:
+        return BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(SoteriaRadius.m),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.orange.withAlpha(100),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
         );
-      case SoteriaButtonType.secondary:
-        return FilledButton.tonal(
-          onPressed: onPressed,
-          child: content,
+      case SoteriaButtonType.primary:
+        return BoxDecoration(
+          color: Theme.of(context).primaryColor,
+          borderRadius: BorderRadius.circular(SoteriaRadius.m),
         );
       case SoteriaButtonType.outlined:
-        return OutlinedButton(
-          onPressed: onPressed,
-          child: content,
+        return BoxDecoration(
+          border: Border.all(color: Theme.of(context).primaryColor, width: 2),
+          borderRadius: BorderRadius.circular(SoteriaRadius.m),
         );
-      case SoteriaButtonType.text:
-        return TextButton(
-          onPressed: onPressed,
-          child: content,
+      case SoteriaButtonType.danger:
+        return BoxDecoration(
+          color: SoteriaColors.error,
+          borderRadius: BorderRadius.circular(SoteriaRadius.m),
+        );
+      case SoteriaButtonType.success:
+        return BoxDecoration(
+          color: SoteriaColors.success,
+          borderRadius: BorderRadius.circular(SoteriaRadius.m),
         );
     }
   }
+
+  Widget _buildContent(BuildContext context) {
+    if (isLoading) {
+      return const SizedBox(
+        height: 24,
+        width: 24,
+        child: CircularProgressIndicator(
+          strokeWidth: 3,
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        ),
+      );
+    }
+
+    final color = _getContentColor();
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (icon != null) ...[
+          Icon(icon, color: color, size: 20),
+          const SizedBox(width: SoteriaSpacing.s8),
+        ],
+        Text(
+          label.toUpperCase(),
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: color,
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+      ],
+    );
+  }
+
+  Color _getContentColor() {
+    if (isDisabled) return Colors.grey.shade600;
+    if (type == SoteriaButtonType.outlined) return SoteriaColors.primaryLight;
+    if (type == SoteriaButtonType.reward) return Colors.black87;
+    return Colors.white;
+  }
 }
 
-/// Defines the visual types available for [SoteriaButton].
-enum SoteriaButtonType {
-  primary,
-  secondary,
-  outlined,
-  text,
-}
+enum SoteriaButtonType { primary, outlined, danger, success, reward }
 
 // --- Previews ---
 
 @Preview(name: 'Button - Primary')
 Widget primaryButtonPreview() {
   return MaterialApp(
+    theme: SoteriaTheme.light,
     home: Scaffold(
       body: Center(
         child: SoteriaButton(
@@ -123,6 +153,7 @@ Widget primaryButtonPreview() {
 @Preview(name: 'Button - Loading')
 Widget loadingButtonPreview() {
   return MaterialApp(
+    theme: SoteriaTheme.light,
     home: Scaffold(
       body: Center(
         child: SoteriaButton(
@@ -138,6 +169,7 @@ Widget loadingButtonPreview() {
 @Preview(name: 'Button - Disabled')
 Widget disabledButtonPreview() {
   return MaterialApp(
+    theme: SoteriaTheme.light,
     home: Scaffold(
       body: Center(
         child: SoteriaButton(

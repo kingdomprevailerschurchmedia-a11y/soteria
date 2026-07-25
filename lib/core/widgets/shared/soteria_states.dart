@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../theme/tokens.dart';
+import '../../design_system/design_system.dart';
 
 /// SoteriaLoadingState displays a centered loading indicator.
 class SoteriaLoadingState extends StatelessWidget {
@@ -28,19 +28,19 @@ class SoteriaErrorState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.l),
+        padding: const EdgeInsets.all(SoteriaSpacing.s24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: AppColors.danger),
-            const SizedBox(height: AppSpacing.m),
+            const Icon(Icons.error_outline, size: 64, color: SoteriaColors.error),
+            const SizedBox(height: SoteriaSpacing.s16),
             Text(
               message,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             if (onRetry != null) ...[
-              const SizedBox(height: AppSpacing.l),
+              const SizedBox(height: SoteriaSpacing.s24),
               ElevatedButton(
                 onPressed: onRetry,
                 child: const Text('Retry'),
@@ -70,18 +70,18 @@ class SoteriaEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.l),
+        padding: const EdgeInsets.all(SoteriaSpacing.s24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, size: 64, color: Colors.grey),
-            const SizedBox(height: AppSpacing.m),
+            const SizedBox(height: SoteriaSpacing.s16),
             Text(
               title,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             if (message != null) ...[
-              const SizedBox(height: AppSpacing.s),
+              const SizedBox(height: SoteriaSpacing.s8),
               Text(
                 message!,
                 textAlign: TextAlign.center,
@@ -103,7 +103,7 @@ class SoteriaSkeleton extends StatefulWidget {
     super.key,
     this.height,
     this.width,
-    this.radius = AppRadius.m,
+    this.radius = SoteriaRadius.m,
   });
 
   final double? height;

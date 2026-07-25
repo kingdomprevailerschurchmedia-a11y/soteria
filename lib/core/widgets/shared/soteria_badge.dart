@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
-import '../../theme/tokens.dart';
+import '../../design_system/design_system.dart';
 
 /// SoteriaBadge displays a small piece of information or status.
 class SoteriaBadge extends StatelessWidget {
   const SoteriaBadge({
     super.key,
     required this.label,
-    this.color = AppColors.primaryLight,
+    this.color = SoteriaColors.primaryLight,
     this.textColor = Colors.white,
   });
 
@@ -19,12 +19,12 @@ class SoteriaBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.s,
-        vertical: AppSpacing.xs,
+        horizontal: SoteriaSpacing.s8,
+        vertical: SoteriaSpacing.s4,
       ),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(AppRadius.circular),
+        borderRadius: BorderRadius.circular(SoteriaRadius.full),
       ),
       child: Text(
         label,
@@ -41,12 +41,13 @@ class SoteriaBadge extends StatelessWidget {
 
 @Preview(name: 'Badge - Success')
 Widget badgePreview() {
-  return const MaterialApp(
-    home: Scaffold(
+  return MaterialApp(
+    theme: SoteriaTheme.light,
+    home: const Scaffold(
       body: Center(
         child: SoteriaBadge(
           label: 'NEW',
-          color: AppColors.success,
+          color: SoteriaColors.success,
         ),
       ),
     ),

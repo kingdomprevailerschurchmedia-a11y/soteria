@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../theme/tokens.dart';
+import '../../design_system/design_system.dart';
 
 /// SoteriaOverlays provides static methods to show common UI overlays.
 class SoteriaOverlays {
@@ -12,10 +12,10 @@ class SoteriaOverlays {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? AppColors.danger : AppColors.primaryLight,
+        backgroundColor: isError ? SoteriaColors.error : SoteriaColors.primaryLight,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.s),
+          borderRadius: BorderRadius.circular(SoteriaRadius.s),
         ),
       ),
     );
@@ -44,7 +44,7 @@ class SoteriaOverlays {
             onPressed: () => Navigator.of(context).pop(true),
             style: isDangerous
                 ? ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.danger,
+                    backgroundColor: SoteriaColors.error,
                     foregroundColor: Colors.white,
                   )
                 : null,
@@ -64,7 +64,7 @@ class SoteriaOverlays {
     return showModalBottomSheet<T>(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(SoteriaRadius.xl)),
       ),
       builder: (context) => Padding(
         padding: EdgeInsets.only(
@@ -73,7 +73,7 @@ class SoteriaOverlays {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: AppSpacing.s),
+            const SizedBox(height: SoteriaSpacing.s8),
             Container(
               width: 40,
               height: 4,
@@ -84,7 +84,7 @@ class SoteriaOverlays {
             ),
             if (title != null) ...[
               Padding(
-                padding: const EdgeInsets.all(AppSpacing.m),
+                padding: const EdgeInsets.all(SoteriaSpacing.s16),
                 child: Text(
                   title,
                   style: Theme.of(context).textTheme.titleLarge,

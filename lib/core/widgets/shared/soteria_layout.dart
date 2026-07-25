@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../theme/tokens.dart';
+import '../../design_system/design_system.dart';
 
 /// SoteriaScaffold is a wrapper around Scaffold that provides consistent layout and padding.
 class SoteriaScaffold extends StatelessWidget {
@@ -51,8 +51,8 @@ class SoteriaSectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.m,
-        vertical: AppSpacing.s,
+        horizontal: SoteriaSpacing.s16,
+        vertical: SoteriaSpacing.s8,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -84,7 +84,7 @@ class SoteriaDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Divider(
       height: 1,
-      thickness: AppBorders.thin,
+      thickness: SoteriaBorders.thin,
       indent: indent,
       color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
     );

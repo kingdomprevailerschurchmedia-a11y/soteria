@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../theme/tokens.dart';
+import '../../design_system/design_system.dart';
 
 /// SoteriaDropdown provides a styled dropdown selection.
 class SoteriaDropdown<T> extends StatelessWidget {
@@ -23,7 +23,7 @@ class SoteriaDropdown<T> extends StatelessWidget {
       children: [
         if (label != null) ...[
           Text(label!, style: Theme.of(context).textTheme.titleSmall),
-          const SizedBox(height: AppSpacing.s),
+          const SizedBox(height: SoteriaSpacing.s8),
         ],
         DropdownButtonFormField<T>(
           value: value,
@@ -31,7 +31,7 @@ class SoteriaDropdown<T> extends StatelessWidget {
           onChanged: onChanged,
           decoration: InputDecoration(
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppRadius.m),
+              borderRadius: BorderRadius.circular(SoteriaRadius.m),
             ),
           ),
         ),
