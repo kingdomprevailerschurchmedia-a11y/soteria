@@ -7,7 +7,7 @@ part 'auth_user_dto.g.dart';
 /// AuthUserDto is the data transfer object for user identity.
 /// It handles JSON serialization for API communication.
 @freezed
-class AuthUserDto with _$AuthUserDto {
+abstract class AuthUserDto with _$AuthUserDto {
   const factory AuthUserDto({
     required String id,
     required String email,

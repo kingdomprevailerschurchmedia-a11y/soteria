@@ -13,8 +13,9 @@ class AppLocalizations {
 }
 
 /// Provider for the current application [Locale].
-class LocaleNotifier extends StateNotifier<Locale> {
-  LocaleNotifier() : super(const Locale('en', ''));
+class LocaleNotifier extends Notifier<Locale> {
+  @override
+  Locale build() => const Locale('en', '');
 
   void setLocale(Locale locale) {
     if (AppLocalizations.supportedLocales.contains(locale)) {
@@ -23,6 +24,6 @@ class LocaleNotifier extends StateNotifier<Locale> {
   }
 }
 
-final localeProvider = StateNotifierProvider<LocaleNotifier, Locale>((ref) {
-  return LocaleNotifier();
-});
+final localeProvider = NotifierProvider<LocaleNotifier, Locale>(
+  LocaleNotifier.new,
+);

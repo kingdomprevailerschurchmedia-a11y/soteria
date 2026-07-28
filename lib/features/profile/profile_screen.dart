@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../auth/presentation/providers/auth_provider.dart';
-import '../../core/widgets/shared/soteria_button.dart';
+import '../auth/presentation/providers/auth_providers.dart';
+import '../auth/application/auth_controller.dart';
+import '../../core/widgets/buttons/soteria_button.dart';
 import '../../core/design_system/design_system.dart';
 
 /// ProfileScreen displays the user's profile information.
@@ -10,7 +11,7 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authUser = ref.watch(authProvider).dataOrNull;
+    final auth = ref.watch(authStateProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -26,16 +27,16 @@ class ProfileScreen extends ConsumerWidget {
             ),
             const SizedBox(height: SoteriaSpacing.s24),
             Text(
-              authUser?.username ?? 'Anonymous',
+              auth.user?.username ?? 'Anonymous',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             Text(
-              authUser?.email ?? '',
+              auth.user?.email ?? '',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const Spacer(),
             SoteriaButton(
-              onPressed: () => ref.read(authProvider.notifier).logout(),
+              onPressed: () => ref.read(authControllerProvider.notifier).signOut(),
               label: 'LOGOUT',
               type: SoteriaButtonType.outlined,
             ),

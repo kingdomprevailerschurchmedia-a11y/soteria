@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/widget_previews.dart';
 import '../../../../core/design_system/design_system.dart';
-import '../../../../core/utils/app_animations.dart';
-import '../../../../core/widgets/shared/soteria_button.dart';
-import '../../../../core/widgets/shared/soteria_card.dart';
+import '../../../../core/widgets/buttons/soteria_button.dart';
 import '../providers/onboarding_provider.dart';
+import '../widgets/onboarding_page_widget.dart';
+import '../widgets/onboarding_illustration.dart';
+import '../widgets/onboarding_footer.dart';
 
-/// OnboardingScreen provides a high-polish walkthrough of Soteria's value prop.
+/// The main onboarding entry point, managing the 6-page walkthrough.
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -17,189 +17,153 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final PageController _pageController = PageController();
-  int _currentPage = 0;
+  int _currentIndex = 0;
 
-  final List<_OnboardingPage> _pages = [
-    const _OnboardingPage(
-      title: 'Competitive Learning',
-      description: 'Master your subjects while competing with students across Africa.',
-      icon: SoteriaIcons.trophy,
-      color: SoteriaColors.primaryLight,
+  final List<_OnboardingData> _pages = [
+    const _OnboardingData(
+      title: 'Learn. Compete.\nBecome Legendary.',
+      description: "Africa's competitive learning platform where knowledge becomes achievement.",
+      illustrationType: OnboardingIllustrationType.hero,
     ),
-    const _OnboardingPage(
-      title: 'Real-Time Duels',
-      description: 'Challenge your friends to 1v1 battles and climb the faculty leaderboard.',
-      icon: Icons.bolt,
-      color: SoteriaColors.streakOrange,
+    const _OnboardingData(
+      title: 'Practice Every Day',
+      description: "Sharpen your skills with daily challenges, earn XP, Coins, and collect exclusive badges.",
+      illustrationType: OnboardingIllustrationType.practice,
     ),
-    const _OnboardingPage(
-      title: 'Earn Rewards',
-      description: 'Turn your knowledge into Coins and claim exclusive prizes and scholarships.',
-      icon: SoteriaIcons.reward,
-      color: SoteriaColors.coinGold,
+    const _OnboardingData(
+      title: 'Challenge Friends',
+      description: "Go head-to-head in Versus Mode, climb the ranks, and build your scholarly reputation.",
+      illustrationType: OnboardingIllustrationType.versus,
+    ),
+    const _OnboardingData(
+      title: 'Join Tournaments',
+      description: "Participate in scheduled faculty and national events. Huge prize pools and glory await.",
+      illustrationType: OnboardingIllustrationType.tournament,
+    ),
+    const _OnboardingData(
+      title: 'Climb the Ranks',
+      description: "See your standing in University and National leaderboards. Prove you are the best.",
+      illustrationType: OnboardingIllustrationType.leaderboard,
+    ),
+    const _OnboardingData(
+      title: 'Ready to Begin?',
+      description: "Join thousands of scholars already competing in the Arena.",
+      illustrationType: OnboardingIllustrationType.ready,
     ),
   ];
 
   void _onNext() {
-    if (_currentPage < _pages.length - 1) {
+    if (_currentIndex < _pages.length - 1) {
       _pageController.nextPage(
         duration: SoteriaAnimations.medium,
         curve: SoteriaAnimations.standard,
       );
     } else {
-      ref.read(onboardingProvider.notifier).completeOnboarding();
+      _complete();
     }
+  }
+
+  void _onSkip() {
+    _pageController.animateToPage(
+      _pages.length - 1,
+      duration: SoteriaAnimations.slow,
+      curve: SoteriaAnimations.standard,
+    );
+  }
+
+  void _complete() {
+    ref.read(onboardingProvider.notifier).completeOnboarding();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLastPage = _currentIndex == _pages.length - 1;
+
     return Scaffold(
-      body: Stack(
-        children: [
-          // Background Gradient
-          AnimatedContainer(
-            duration: SoteriaAnimations.slow,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  _pages[_currentPage].color.withAlpha(20),
-                  SoteriaColors.backgroundLight,
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: _currentIndex > 0 
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new_rounded),
+              onPressed: () => _pageController.previousPage(
+                duration: SoteriaAnimations.medium, 
+                curve: SoteriaAnimations.standard,
               ),
+            )
+          : null,
+      ),
+      extendBodyBehindAppBar: true,
+      body: Column(
+        children: [
+          Expanded(
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: _pages.length,
+              onPageChanged: (index) => setState(() => _currentIndex = index),
+              itemBuilder: (context, index) {
+                final data = _pages[index];
+                return OnboardingPageWidget(
+                  title: data.title,
+                  description: data.description,
+                  illustrationType: data.illustrationType,
+                );
+              },
             ),
           ),
+          
+          if (!isLastPage)
+            OnboardingFooter(
+              itemCount: _pages.length,
+              currentIndex: _currentIndex,
+              onNext: _onNext,
+              onSkip: _onSkip,
+            )
+          else
+            _buildFinalFooter(),
+        ],
+      ),
+    );
+  }
 
-          SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  child: PageView.builder(
-                    controller: _pageController,
-                    onPageChanged: (idx) => setState(() => _currentPage = idx),
-                    itemCount: _pages.length,
-                    itemBuilder: (context, idx) {
-                      return AppAnimations.slideIn(
-                        child: _PageContent(page: _pages[idx]),
-                      );
-                    },
-                  ),
-                ),
-
-                // Bottom Controls
-                Padding(
-                  padding: const EdgeInsets.all(SoteriaSpacing.s24),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          _pages.length,
-                          (idx) => _Indicator(isActive: idx == _currentPage),
-                        ),
-                      ),
-                      const SizedBox(height: SoteriaSpacing.s48),
-                      SoteriaButton(
-                        onPressed: _onNext,
-                        label: _currentPage == _pages.length - 1 ? 'GET STARTED' : 'CONTINUE',
-                        type: _currentPage == _pages.length - 1 
-                            ? SoteriaButtonType.reward 
-                            : SoteriaButtonType.primary,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+  Widget _buildFinalFooter() {
+    return Padding(
+      padding: const EdgeInsets.all(SoteriaSpacing.s24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SoteriaButton(
+            onPressed: _complete,
+            label: 'GET STARTED',
+            type: SoteriaButtonType.reward,
           ),
+          const SizedBox(height: SoteriaSpacing.s16),
+          SoteriaButton(
+            onPressed: _complete, // Future: login as guest
+            label: 'CONTINUE AS GUEST',
+            type: SoteriaButtonType.secondary,
+          ),
+          const SizedBox(height: SoteriaSpacing.s16),
         ],
       ),
     );
   }
 }
 
-class _OnboardingPage {
-  const _OnboardingPage({
+class _OnboardingData {
+  const _OnboardingData({
     required this.title,
     required this.description,
-    required this.icon,
-    required this.color,
+    required this.illustrationType,
   });
 
   final String title;
   final String description;
-  final IconData icon;
-  final Color color;
-}
-
-class _PageContent extends StatelessWidget {
-  const _PageContent({required this.page});
-  final _OnboardingPage page;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: SoteriaSpacing.s48),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SoteriaCard(
-            isGlass: true,
-            color: page.color,
-            padding: const EdgeInsets.all(SoteriaSpacing.s48),
-            child: Icon(page.icon, size: 80, color: page.color),
-          ),
-          const SizedBox(height: SoteriaSpacing.s48),
-          Text(
-            page.title,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: page.color,
-                ),
-          ),
-          const SizedBox(height: SoteriaSpacing.s16),
-          Text(
-            page.description,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Colors.grey.shade700,
-                  height: 1.5,
-                ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Indicator extends StatelessWidget {
-  const _Indicator({required this.isActive});
-  final bool isActive;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: SoteriaAnimations.fast,
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      height: 8,
-      width: isActive ? 24 : 8,
-      decoration: BoxDecoration(
-        color: isActive ? SoteriaColors.primaryLight : Colors.grey.shade300,
-        borderRadius: BorderRadius.all(Radius.circular(SoteriaRadius.xs)),
-      ),
-    );
-  }
-}
-
-// --- Previews ---
-
-@Preview(name: 'Onboarding - Walkthrough')
-Widget onboardingPreview() {
-  return const ProviderScope(
-    child: MaterialApp(
-      home: OnboardingScreen(),
-    ),
-  );
+  final OnboardingIllustrationType illustrationType;
 }

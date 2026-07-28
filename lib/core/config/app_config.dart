@@ -17,7 +17,6 @@ class AppConfig {
     required this.enableAnalytics,
     required this.enableLogging,
     required this.enableCrashReporting,
-    required this.featureFlags,
   });
 
   final String appName;
@@ -27,7 +26,6 @@ class AppConfig {
   final bool enableAnalytics;
   final bool enableLogging;
   final bool enableCrashReporting;
-  final Map<String, bool> featureFlags;
 
   /// Returns true if the environment is development.
   bool get isDevelopment => environment == AppEnvironment.development;

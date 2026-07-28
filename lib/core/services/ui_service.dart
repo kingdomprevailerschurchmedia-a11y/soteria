@@ -75,12 +75,12 @@ class UIService {
 
   /// Shows a global loading overlay.
   void showLoadingOverlay(BuildContext context) {
-    _ref.read(loadingOverlayProvider.notifier).state = true;
+    _ref.read(loadingOverlayProvider.notifier).toggle(true);
   }
 
   /// Hides the global loading overlay.
   void hideLoadingOverlay() {
-    _ref.read(loadingOverlayProvider.notifier).state = false;
+    _ref.read(loadingOverlayProvider.notifier).toggle(false);
   }
 }
 
@@ -93,4 +93,13 @@ final uiServiceProvider = Provider<UIService>((ref) {
 });
 
 /// State provider to control the global loading overlay.
-final loadingOverlayProvider = StateProvider<bool>((ref) => false);
+final loadingOverlayProvider = NotifierProvider<LoadingOverlayNotifier, bool>(
+  LoadingOverlayNotifier.new,
+);
+
+class LoadingOverlayNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void toggle(bool value) => state = value;
+}

@@ -1,15 +1,15 @@
-import '../error/failures.dart';
+import '../errors/failure.dart';
 
 /// Result is a sealed class that represents the outcome of an operation.
-/// It can be [Success], [Failure], or [Loading].
+/// It can be [Success], [Error], or [Loading].
 sealed class Result<T> {
   const Result();
 
   /// Returns true if the result is a [Success].
   bool get isSuccess => this is Success<T>;
 
-  /// Returns true if the result is a [Failure].
-  bool get isFailure => this is Failure<T>;
+  /// Returns true if the result is an [Error].
+  bool get isFailure => this is Error<T>;
 
   /// Returns true if the result is [Loading].
   bool get isLoading => this is Loading<T>;
@@ -21,9 +21,21 @@ sealed class Result<T> {
   }
 
   /// Convenience method to get the failure if failure.
-  FailureResult? get failureOrNull {
+  Failure? get failureOrNull {
     final res = this;
-    return res is Failure<T> ? res.failure : null;
+    return res is Error<T> ? res.failure : null;
+  }
+
+  /// Pattern matching for the result states.
+  R when<R>({
+    required R Function(T data) data,
+    required R Function(Failure failure, StackTrace? stackTrace) error,
+    required R Function() loading,
+  }) {
+    final res = this;
+    if (res is Success<T>) return data(res.data);
+    if (res is Error<T>) return error(res.failure, null);
+    return loading();
   }
 }
 
@@ -34,9 +46,10 @@ class Success<T> extends Result<T> {
 }
 
 /// Represents a failed operation.
-class Failure<T> extends Result<T> {
-  const Failure(this.failure);
-  final FailureResult failure;
+/// Renamed from Failure to Error to avoid conflict with the Failure entity.
+class Error<T> extends Result<T> {
+  const Error(this.failure);
+  final Failure failure;
 }
 
 /// Represents an operation in progress.

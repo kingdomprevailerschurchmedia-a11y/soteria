@@ -4,7 +4,7 @@ part 'auth_user.freezed.dart';
 
 /// AuthUser represents the core identity of a logged-in user in the domain layer.
 @freezed
-class AuthUser with _$AuthUser {
+abstract class AuthUser with _$AuthUser {
   const factory AuthUser({
     required String id,
     required String email,

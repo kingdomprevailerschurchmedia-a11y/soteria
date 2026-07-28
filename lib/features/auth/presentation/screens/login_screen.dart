@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter/widget_previews.dart';
+import 'package:local_auth/local_auth.dart';
 import '../../../../core/design_system/design_system.dart';
 import '../../../../core/utils/app_animations.dart';
-import '../../../../core/widgets/forms/soteria_text_field.dart';
-import '../../../../core/widgets/shared/soteria_button.dart';
+import '../../../../core/widgets/inputs/soteria_text_field.dart';
+import '../../../../core/widgets/buttons/soteria_button.dart';
 import '../../../../core/services/ui_service.dart';
-import '../../../../core/routes/route_constants.dart';
-import '../providers/auth_provider.dart';
+import '../../../../core/navigation/navigation_constants.dart';
+import '../../application/auth_controller.dart';
+import '../providers/auth_providers.dart';
 
-/// LoginScreen allows users to authenticate with their existing credentials.
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -22,6 +22,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _rememberMe = true;
+  bool _canCheckBiometrics = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkBiometrics();
+  }
+
+  Future<void> _checkBiometrics() async {
+    final auth = LocalAuthentication();
+    final canCheck = await auth.canCheckBiometrics;
+    if (mounted) setState(() => _canCheckBiometrics = canCheck);
+  }
 
   @override
   void dispose() {
@@ -32,27 +46,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _onLogin() async {
     if (_formKey.currentState?.validate() ?? false) {
-      await ref.read(authProvider.notifier).login(
+      await ref.read(authControllerProvider.notifier).signIn(
         _emailController.text,
         _passwordController.text,
+        rememberMe: _rememberMe,
       );
 
-      final authState = ref.read(authProvider);
-      if (authState.isFailure) {
-        if (mounted) {
-          ref.read(uiServiceProvider).showSnackBar(
-            context: context,
-            message: authState.failureOrNull?.message ?? 'Login failed',
-            type: SnackBarType.error,
-          );
-        }
+      final auth = ref.read(authStateProvider);
+      if (auth.failure != null && mounted) {
+        ref.read(uiServiceProvider).showSnackBar(
+          context: context,
+          message: auth.failure!.message,
+          type: SnackBarType.error,
+        );
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
+    final auth = ref.watch(authStateProvider);
 
     return Scaffold(
       body: SafeArea(
@@ -65,25 +78,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               children: [
                 const SizedBox(height: SoteriaSpacing.s64),
                 AppAnimations.scaleIn(
-                  child: const Center(
-                    child: FlutterLogo(size: 80),
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.all(SoteriaSpacing.s24),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.shield_rounded, size: 64, color: Theme.of(context).primaryColor),
+                    ),
                   ),
                 ),
                 const SizedBox(height: SoteriaSpacing.s40),
                 Text(
                   'Welcome Back',
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: SoteriaSpacing.s8),
-                Text(
-                  'Log in to continue your journey.',
+                const Text(
+                  'Log in to your scholar account.',
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey,
-                      ),
+                  style: TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: SoteriaSpacing.s64),
                 
@@ -92,8 +108,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     controller: _emailController,
                     label: 'Email Address',
                     hintText: 'name@example.com',
+                    type: SoteriaTextFieldType.email,
                     prefixIcon: const Icon(Icons.email_outlined),
-                    keyboardType: TextInputType.emailAddress,
                     validator: (v) => (v == null || !v.contains('@')) ? 'Invalid email' : null,
                   ),
                 ),
@@ -103,32 +119,57 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     controller: _passwordController,
                     label: 'Password',
                     hintText: 'Enter your password',
+                    type: SoteriaTextFieldType.password,
                     prefixIcon: const Icon(Icons.lock_outline),
-                    obscureText: true,
-                    validator: (v) => (v == null || v.length < 6) ? 'Password too short' : null,
+                    validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
                   ),
                 ),
-                const SizedBox(height: SoteriaSpacing.s64),
                 
+                const SizedBox(height: SoteriaSpacing.s16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: _rememberMe,
+                          onChanged: (v) => setState(() => _rememberMe = v ?? false),
+                          activeColor: Theme.of(context).primaryColor,
+                        ),
+                        const Text('Remember Me', style: TextStyle(fontSize: 13)),
+                      ],
+                    ),
+                    TextButton(
+                      onPressed: () => context.pushNamed(NavigationConstants.forgotPasswordName),
+                      child: const Text('Forgot Password?', style: TextStyle(fontSize: 13)),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: SoteriaSpacing.s40),
                 SoteriaButton(
                   onPressed: _onLogin,
                   label: 'LOGIN',
-                  isLoading: authState.isLoading,
-                ),
-                const SizedBox(height: SoteriaSpacing.s24),
-                
-                TextButton(
-                  onPressed: () => context.pushNamed(RouteConstants.home), // Placeholder for testing
-                  child: const Text('FORGOT PASSWORD?'),
+                  isLoading: auth.isLoading,
                 ),
                 
-                const SizedBox(height: SoteriaSpacing.s80),
+                if (_canCheckBiometrics) ...[
+                  const SizedBox(height: SoteriaSpacing.s16),
+                  SoteriaButton(
+                    onPressed: () => ref.read(authControllerProvider.notifier).signInWithBiometrics(),
+                    label: 'USE BIOMETRICS',
+                    type: SoteriaButtonType.outlined,
+                    icon: Icons.fingerprint_rounded,
+                  ),
+                ],
+
+                const SizedBox(height: SoteriaSpacing.s64),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text("Don't have an account?"),
                     TextButton(
-                      onPressed: () => context.pushNamed(RouteConstants.register),
+                      onPressed: () => context.pushNamed(NavigationConstants.registerName),
                       child: const Text('SIGN UP'),
                     ),
                   ],
@@ -140,15 +181,4 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ),
     );
   }
-}
-
-// --- Previews ---
-
-@Preview(name: 'Auth - Login')
-Widget loginPreview() {
-  return const ProviderScope(
-    child: MaterialApp(
-      home: LoginScreen(),
-    ),
-  );
 }

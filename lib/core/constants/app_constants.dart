@@ -4,6 +4,9 @@ class AppConstants {
   /// The name of the application.
   static const String appName = 'Soteria';
 
+  /// The version of the application.
+  static const String appVersion = '1.0.0+1';
+
   /// The default animation duration for UI transitions.
   static const Duration defaultAnimationDuration = Duration(milliseconds: 300);
 
