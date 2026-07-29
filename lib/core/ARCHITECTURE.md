@@ -53,3 +53,14 @@ Use `when` to handle the `Success`, `Error`, and `Loading` states in the UI.
 
 - **Preview Gallery**: Every reusable widget must have a `@Preview` function and be registered in the `PreviewRegistry`.
 - **Developer Dashboard**: Instant access to Feature Flags, Analytics logs, and Performance metrics. Accessible only in Debug builds.
+
+## 8. Identity & Session Management
+
+We use a two-tiered identity system:
+
+1.  **AuthController**: Manages the high-level authentication state (status, user profile).
+2.  **SessionController**: Manages the technical session lifecycle (restoration, token validity, idle timeouts).
+
+-   **Guest Mode**: Guests can earn XP and Coins which are persisted locally using `GuestProgress`.
+-   **Upgrades**: When a guest registers, the `AuthenticationRepository.migrateGuestData` interface should be used to sync local stats to the new account.
+-   **Restoration**: The system automatically attempts to restore the previous session on boot via the `AppInitializationService`.

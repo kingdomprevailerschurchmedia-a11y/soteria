@@ -7,6 +7,9 @@ class NavigationConstants {
   static const String login = '/login';
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
+  static const String verifyRecovery = '/verify-recovery';
+  static const String resetPassword = '/reset-password';
+  static const String recoverySuccess = '/recovery-success';
 
   // Shell Routes
   static const String home = '/';
@@ -29,14 +32,19 @@ class NavigationConstants {
   static const String performance = 'performance';
   static const String accessibility = 'accessibility';
   static const String validation = 'validation';
+  static const String loginEmail = 'email';
 
   // Route Names
   static const String splashName = 'splash';
   static const String onboardingName = 'onboarding';
   static const String personalizationName = 'personalization';
   static const String loginName = 'login';
+  static const String loginEmailName = 'login-email';
   static const String registerName = 'register';
   static const String forgotPasswordName = 'forgot-password';
+  static const String verifyRecoveryName = 'verify-recovery';
+  static const String resetPasswordName = 'reset-password';
+  static const String recoverySuccessName = 'recovery-success';
   static const String homeName = 'home';
   static const String practiceName = 'practice';
   static const String proName = 'pro';

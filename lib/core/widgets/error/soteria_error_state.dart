@@ -7,11 +7,25 @@ class SoteriaErrorState extends StatelessWidget {
   const SoteriaErrorState({
     super.key,
     required this.message,
+    this.title = 'Oops! Something went wrong',
+    this.icon = SoteriaIcons.error,
     this.onRetry,
   });
 
   final String message;
+  final String title;
+  final IconData icon;
   final VoidCallback? onRetry;
+
+  /// Convenience constructor for offline state.
+  static Widget offline({VoidCallback? onRetry}) {
+    return SoteriaErrorState(
+      title: 'Connection Lost',
+      message: 'It seems you are offline. Please check your internet connection and try again.',
+      icon: Icons.wifi_off_rounded,
+      onRetry: onRetry,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +35,10 @@ class SoteriaErrorState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(SoteriaIcons.error, size: 80, color: SoteriaColors.error),
+            Icon(icon, size: 80, color: SoteriaColors.error),
             const SizedBox(height: SoteriaSpacing.s24),
             Text(
-              'Oops! Something went wrong',
+              title,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),

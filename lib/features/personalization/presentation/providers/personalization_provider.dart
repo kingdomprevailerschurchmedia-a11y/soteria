@@ -33,6 +33,8 @@ class PersonalizationNotifier extends _$PersonalizationNotifier {
     _repository = repo;
     
     final result = await repo.getProfile();
+    if (!ref.mounted) return;
+
     final isCompleted = prefs.getBool('personalization_completed') ?? false;
     
     state = state.copyWith(

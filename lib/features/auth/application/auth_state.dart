@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../domain/entities/auth_user.dart';
 import '../domain/entities/auth_status.dart';
+import '../domain/entities/auth_provider_type.dart';
 import '../../../../core/errors/failure.dart';
 
 part 'auth_state.freezed.dart';
@@ -12,6 +13,8 @@ abstract class AuthState with _$AuthState {
     @Default(AuthStatus.initial) AuthStatus status,
     AuthUser? user,
     Failure? failure,
+    AuthProviderType? lastUsedProvider,
+    @Default(false) bool isCancelled,
   }) = _AuthState;
 
   const AuthState._();

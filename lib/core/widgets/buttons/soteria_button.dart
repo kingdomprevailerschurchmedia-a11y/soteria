@@ -37,18 +37,24 @@ class SoteriaButton extends StatelessWidget {
   Widget build(BuildContext context) {
     QualityChecker.checkSemantics(label, component: 'SoteriaButton');
 
-    return AppAnimations.bounceClick(
-      onTap: onPressed ?? () {},
-      isDisabled: isDisabled || isLoading || onPressed == null,
-      child: SizedBox(
-        width: fullWidth ? double.infinity : null,
-        height: _getHeight(),
-        child: DecoratedBox(
-          decoration: _getDecoration(context),
-          child: Center(
-            child: Padding(
-              padding: _getPadding(),
-              child: _buildContent(context),
+    return Semantics(
+      button: true,
+      enabled: !isDisabled && !isLoading,
+      label: label,
+      hint: isLoading ? 'Loading, please wait' : null,
+      child: AppAnimations.bounceClick(
+        onTap: onPressed ?? () {},
+        isDisabled: isDisabled || isLoading || onPressed == null,
+        child: SizedBox(
+          width: fullWidth ? double.infinity : null,
+          height: _getHeight(),
+          child: DecoratedBox(
+            decoration: _getDecoration(context),
+            child: Center(
+              child: Padding(
+                padding: _getPadding(),
+                child: _buildContent(context),
+              ),
             ),
           ),
         ),
@@ -74,7 +80,7 @@ class SoteriaButton extends StatelessWidget {
 
   Decoration _getDecoration(BuildContext context) {
     final theme = Theme.of(context);
-    final borderRadius = BorderRadius.circular(SoteriaRadius.m);
+    final borderRadius = BorderRadius.circular(SoteriaRadius.button);
 
     if (isDisabled) {
       return BoxDecoration(
@@ -93,6 +99,7 @@ class SoteriaButton extends StatelessWidget {
         return BoxDecoration(
           color: theme.colorScheme.secondaryContainer,
           borderRadius: borderRadius,
+          border: Border.all(color: SoteriaColors.premiumBorder),
         );
       case SoteriaButtonType.outlined:
         return BoxDecoration(
@@ -113,8 +120,8 @@ class SoteriaButton extends StatelessWidget {
         );
       case SoteriaButtonType.reward:
         return BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [SoteriaColors.coinGold, Color(0xFFFFA500)],
+          gradient: LinearGradient(
+            colors: [SoteriaColors.coinGold, const Color(0xFFFFA500)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -181,12 +188,12 @@ class SoteriaButton extends StatelessWidget {
 
     switch (type) {
       case SoteriaButtonType.primary: return theme.colorScheme.onPrimary;
-      case SoteriaButtonType.secondary: return theme.colorScheme.onSecondaryContainer;
+      case SoteriaButtonType.secondary: return theme.colorScheme.onSecondary;
       case SoteriaButtonType.outlined: return theme.colorScheme.primary;
       case SoteriaButtonType.text: return theme.colorScheme.primary;
-      case SoteriaButtonType.destructive: return SoteriaColors.onError;
-      case SoteriaButtonType.success: return SoteriaColors.onSuccess;
-      case SoteriaButtonType.reward: return Colors.black87;
+      case SoteriaButtonType.destructive: return SoteriaColors.error;
+      case SoteriaButtonType.success: return SoteriaColors.success;
+      case SoteriaButtonType.reward: return SoteriaColors.onAccentGold;
     }
   }
 }

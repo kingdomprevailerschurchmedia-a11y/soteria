@@ -33,7 +33,7 @@ class SoteriaAvatar extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isOnline ? SoteriaColors.success : Colors.grey,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(color: SoteriaColors.background, width: 2),
               ),
             ),
           ),
@@ -44,15 +44,14 @@ class SoteriaAvatar extends StatelessWidget {
   Widget _buildAvatar(BuildContext context) {
     return CircleAvatar(
       radius: size / 2,
-      backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-      backgroundImage: imageUrl != null ? NetworkImage(imageUrl!) : null,
+      backgroundColor: SoteriaColors.surfaceL2,
       child: imageUrl == null && initials != null
           ? Text(
               initials!.toUpperCase(),
               style: TextStyle(
                 fontSize: size * 0.4,
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColor,
+                color: SoteriaColors.primary,
               ),
             )
           : null,

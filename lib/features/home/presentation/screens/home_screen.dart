@@ -10,6 +10,8 @@ import '../widgets/home_header.dart';
 import '../widgets/active_tournaments.dart';
 import '../widgets/quick_play_grid.dart';
 import '../../domain/entities/user_stats.dart';
+import '../../../auth/presentation/providers/auth_providers.dart';
+import '../../../auth/presentation/widgets/guest/guest_badge.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -17,8 +19,20 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final homeState = ref.watch(homeStateProvider);
+    final auth = ref.watch(authStateProvider);
 
     return SoteriaScaffold(
+      appBar: AppBar(
+        title: const Text('Soteria'),
+        centerTitle: false,
+        actions: [
+          if (auth.isGuest)
+            const Padding(
+              padding: EdgeInsets.only(right: 16.0),
+              child: Center(child: GuestBadge()),
+            ),
+        ],
+      ),
       body: RefreshIndicator(
         onRefresh: () => ref.read(homeStateProvider.notifier).refresh(),
         child: homeState.when(

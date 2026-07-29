@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../../core/design_system/design_system.dart';
-import '../../../../core/widgets/buttons/soteria_icon_button.dart';
 
 /// UI placeholder for social authentication options (Google, Apple).
 class SocialAuthSection extends StatelessWidget {

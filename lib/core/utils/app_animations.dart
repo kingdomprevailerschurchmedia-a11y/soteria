@@ -1,10 +1,72 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../design_system/design_system.dart';
 
-/// AppAnimations provides reusable animation widgets for consistent motion.
+/// AppAnimations provides centralized access to the design system's motion tokens
+/// and reusable animation wrappers.
 class AppAnimations {
-  /// A wrapper that adds a subtle scale down effect on tap and triggers haptics.
+  /// Simple fade-in animation.
+  static Widget fadeIn({
+    required Widget child,
+    Duration duration = SoteriaAnimations.medium,
+    Duration delay = Duration.zero,
+  }) {
+    return _AnimatedWrapper(
+      delay: delay,
+      builder: (context, controller) => FadeTransition(
+        opacity: controller.drive(CurveTween(curve: SoteriaAnimations.standard)),
+        child: child,
+      ),
+    );
+  }
+
+  /// Slide-in from bottom with fade.
+  static Widget slideIn({
+    required Widget child,
+    Offset offset = const Offset(0, 0.1),
+    Duration duration = SoteriaAnimations.medium,
+    Duration delay = Duration.zero,
+  }) {
+    return _AnimatedWrapper(
+      delay: delay,
+      builder: (context, controller) {
+        final animation = CurvedAnimation(
+          parent: controller,
+          curve: SoteriaAnimations.decelerate,
+        );
+
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: offset,
+              end: Offset.zero,
+            ).animate(animation),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  /// Scale-in with bounce effect.
+  static Widget scaleIn({
+    required Widget child,
+    double begin = 0.8,
+    Duration duration = SoteriaAnimations.slow,
+    Duration delay = Duration.zero,
+  }) {
+    return _AnimatedWrapper(
+      delay: delay,
+      builder: (context, controller) => ScaleTransition(
+        scale: Tween<double>(begin: begin, end: 1.0).animate(
+          CurvedAnimation(parent: controller, curve: SoteriaAnimations.bounce),
+        ),
+        child: child,
+      ),
+    );
+  }
+
+  /// Reusable click bounce animation for interactive elements.
   static Widget bounceClick({
     required Widget child,
     required VoidCallback onTap,
@@ -16,52 +78,46 @@ class AppAnimations {
       child: child,
     );
   }
+}
 
-  /// Fade and slide up animation for content entrance.
-  static Widget slideIn({
-    required Widget child,
-    Duration duration = SoteriaAnimations.medium,
-    Offset offset = const Offset(0, 0.1),
-  }) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: 1.0),
-      duration: duration,
-      curve: SoteriaAnimations.decelerate,
-      builder: (context, value, child) {
-        return Opacity(
-          opacity: value,
-          child: Transform.translate(
-            offset: Offset(0, (1 - value) * 20),
-            child: child,
-          ),
-        );
-      },
-      child: child,
+class _AnimatedWrapper extends StatefulWidget {
+  const _AnimatedWrapper({required this.builder, required this.delay});
+  final Widget Function(BuildContext, AnimationController) builder;
+  final Duration delay;
+
+  @override
+  State<_AnimatedWrapper> createState() => _AnimatedWrapperState();
+}
+
+class _AnimatedWrapperState extends State<_AnimatedWrapper>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: SoteriaAnimations.medium,
     );
+
+    if (widget.delay == Duration.zero) {
+      _controller.forward();
+    } else {
+      Future.delayed(widget.delay, () {
+        if (mounted) _controller.forward();
+      });
+    }
   }
 
-  /// Scale entrance animation.
-  static Widget scaleIn({
-    required Widget child,
-    Duration duration = SoteriaAnimations.medium,
-    double begin = 0.9,
-  }) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: begin, end: 1.0),
-      duration: duration,
-      curve: SoteriaAnimations.bounce,
-      builder: (context, value, child) {
-        return Transform.scale(
-          scale: value,
-          child: Opacity(
-            opacity: (value - begin) / (1 - begin),
-            child: child,
-          ),
-        );
-      },
-      child: child,
-    );
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(context, _controller);
 }
 
 class _BounceClickWrapper extends StatefulWidget {
@@ -82,16 +138,16 @@ class _BounceClickWrapper extends StatefulWidget {
 class _BounceClickWrapperState extends State<_BounceClickWrapper>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
+  late Animation<double> _scale;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: SoteriaAnimations.instant,
+      duration: const Duration(milliseconds: 100),
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+    _scale = Tween<double>(begin: 1.0, end: 0.95).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
   }
@@ -102,34 +158,15 @@ class _BounceClickWrapperState extends State<_BounceClickWrapper>
     super.dispose();
   }
 
-  void _handleTapDown(TapDownDetails details) {
-    if (!widget.isDisabled) {
-      _controller.forward();
-      HapticFeedback.lightImpact();
-    }
-  }
-
-  void _handleTapUp(TapUpDetails details) {
-    if (!widget.isDisabled) {
-      _controller.reverse();
-      widget.onTap();
-    }
-  }
-
-  void _handleTapCancel() {
-    if (!widget.isDisabled) {
-      _controller.reverse();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: _handleTapDown,
-      onTapUp: _handleTapUp,
-      onTapCancel: _handleTapCancel,
+      onTapDown: widget.isDisabled ? null : (_) => _controller.forward(),
+      onTapUp: widget.isDisabled ? null : (_) => _controller.reverse(),
+      onTapCancel: widget.isDisabled ? null : () => _controller.reverse(),
+      onTap: widget.isDisabled ? null : widget.onTap,
       child: ScaleTransition(
-        scale: _scaleAnimation,
+        scale: _scale,
         child: widget.child,
       ),
     );

@@ -20,7 +20,7 @@ class PreviewWrapper extends ConsumerWidget {
     final notifier = ref.read(previewSettingsProvider.notifier);
 
     return Theme(
-      data: settings.isDarkMode ? SoteriaTheme.dark : SoteriaTheme.light,
+      data: SoteriaTheme.dark,
       child: Scaffold(
         appBar: AppBar(
           title: Text(title),

@@ -15,6 +15,7 @@ class RegistrationController extends _$RegistrationController {
   @override
   RegistrationState build() {
     _repository = ref.watch(authenticationRepositoryProvider);
+    ref.onDispose(() => _usernameDebounce?.cancel());
     return const RegistrationState();
   }
 
@@ -39,6 +40,8 @@ class RegistrationController extends _$RegistrationController {
   Future<void> _checkUsername(String value) async {
     state = state.copyWith(isCheckingUsername: true);
     final result = await _repository.checkUsernameAvailability(value);
+    
+    if (!ref.mounted) return;
     
     if (state.username == value) {
       state = state.copyWith(

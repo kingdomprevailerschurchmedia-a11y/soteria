@@ -10,6 +10,9 @@ class AppLifecycleService with WidgetsBindingObserver {
 
   AppLifecycleState get lastState => _lastState;
 
+  bool get isForeground => _lastState == AppLifecycleState.resumed;
+  bool get isBackground => _lastState == AppLifecycleState.paused;
+
   /// Initializes the observer.
   void init() {
     WidgetsBinding.instance.addObserver(this);

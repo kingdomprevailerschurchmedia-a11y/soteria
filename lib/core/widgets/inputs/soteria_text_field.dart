@@ -18,6 +18,7 @@ class SoteriaTextField extends StatelessWidget {
     this.onChanged,
     this.enabled = true,
     this.isLoading = false,
+    this.autofillHints,
   });
 
   final TextEditingController? controller;
@@ -30,6 +31,7 @@ class SoteriaTextField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final bool enabled;
   final bool isLoading;
+  final Iterable<String>? autofillHints;
 
   @override
   Widget build(BuildContext context) {
@@ -47,27 +49,32 @@ class SoteriaTextField extends StatelessWidget {
           ),
           const SizedBox(height: SoteriaSpacing.s8),
         ],
-        TextFormField(
-          controller: controller,
-          validator: validator,
-          onChanged: onChanged,
-          enabled: enabled && !isLoading,
-          obscureText: type == SoteriaTextFieldType.password,
-          keyboardType: _getKeyboardType(),
-          maxLines: type == SoteriaTextFieldType.multiline ? 4 : 1,
-          style: Theme.of(context).textTheme.bodyLarge,
-          decoration: InputDecoration(
-            hintText: hintText,
-            prefixIcon: prefixIcon,
-            suffixIcon: _buildSuffixIcon(),
-            filled: true,
-            fillColor: enabled ? null : Colors.grey.withValues(alpha: 0.1),
-            border: _buildBorder(),
-            enabledBorder: _buildBorder(color: SoteriaColors.outlineLight),
-            focusedBorder: _buildBorder(color: Theme.of(context).primaryColor, width: 2),
-            errorBorder: _buildBorder(color: SoteriaColors.error),
-            disabledBorder: _buildBorder(color: Colors.grey.withValues(alpha: 0.2)),
-            contentPadding: const EdgeInsets.all(SoteriaSpacing.s16),
+        Semantics(
+          label: label ?? hintText,
+          textField: true,
+          child: TextFormField(
+            controller: controller,
+            validator: validator,
+            onChanged: onChanged,
+            enabled: enabled && !isLoading,
+            obscureText: type == SoteriaTextFieldType.password,
+            keyboardType: _getKeyboardType(),
+            autofillHints: autofillHints ?? _getAutofillHints(),
+            maxLines: type == SoteriaTextFieldType.multiline ? 4 : 1,
+            style: Theme.of(context).textTheme.bodyLarge,
+            decoration: InputDecoration(
+              hintText: hintText,
+              prefixIcon: prefixIcon,
+              suffixIcon: _buildSuffixIcon(),
+              filled: true,
+              fillColor: enabled ? null : Colors.grey.withValues(alpha: 0.1),
+              border: _buildBorder(),
+              enabledBorder: _buildBorder(color: SoteriaColors.outlineLight),
+              focusedBorder: _buildBorder(color: Theme.of(context).primaryColor, width: 2),
+              errorBorder: _buildBorder(color: SoteriaColors.error),
+              disabledBorder: _buildBorder(color: Colors.grey.withValues(alpha: 0.2)),
+              contentPadding: const EdgeInsets.all(SoteriaSpacing.s16),
+            ),
           ),
         ),
       ],
@@ -80,6 +87,15 @@ class SoteriaTextField extends StatelessWidget {
       case SoteriaTextFieldType.phone: return TextInputType.phone;
       case SoteriaTextFieldType.multiline: return TextInputType.multiline;
       default: return TextInputType.text;
+    }
+  }
+
+  Iterable<String>? _getAutofillHints() {
+    switch (type) {
+      case SoteriaTextFieldType.email: return [AutofillHints.email];
+      case SoteriaTextFieldType.password: return [AutofillHints.password];
+      case SoteriaTextFieldType.phone: return [AutofillHints.telephoneNumber];
+      default: return null;
     }
   }
 

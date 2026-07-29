@@ -10,6 +10,10 @@ class SoteriaIcons {
   static const IconData schoolOutlined = Icons.school_outlined;
   static const IconData trophy = Icons.emoji_events;
   static const IconData trophyOutlined = Icons.emoji_events_outlined;
+  static const IconData compete = Icons.bolt;
+  static const IconData competeOutlined = Icons.bolt_outlined;
+  static const IconData leaderboard = Icons.leaderboard;
+  static const IconData leaderboardOutlined = Icons.leaderboard_outlined;
   static const IconData person = Icons.person;
   static const IconData personOutlined = Icons.person_outline;
   static const IconData settings = Icons.settings;

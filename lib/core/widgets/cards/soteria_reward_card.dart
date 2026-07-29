@@ -21,23 +21,22 @@ class SoteriaRewardCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return SoteriaCard(
       onTap: onTap,
-      isGlass: true,
-      color: SoteriaColors.coinGold,
+      borderColor: SoteriaColors.accentGold,
       padding: const EdgeInsets.all(SoteriaSpacing.s24),
       child: Column(
         children: [
-          Icon(icon, color: Colors.black87, size: 48),
+          Icon(icon, color: SoteriaColors.textPrimary, size: 48),
           const SizedBox(height: SoteriaSpacing.s16),
           Text(
             title,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.black87,
+                  color: SoteriaColors.textPrimary,
                 ),
           ),
           Text(
             reward,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: Colors.black,
+                  color: SoteriaColors.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
           ),

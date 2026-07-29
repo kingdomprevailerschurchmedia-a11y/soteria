@@ -31,6 +31,39 @@ class MockAuthenticationDataSource implements AuthenticationDataSource {
   }
 
   @override
+  Future<AuthUserDto> signInWithGoogle() async {
+    await Future<void>.delayed(const Duration(seconds: 2));
+    _currentUser = const AuthUserDto(
+      id: 'google_123',
+      email: 'google@scholar.com',
+      username: 'GoogleScholar',
+    );
+    return _currentUser!;
+  }
+
+  @override
+  Future<AuthUserDto> signInWithApple() async {
+    await Future<void>.delayed(const Duration(seconds: 2));
+    _currentUser = const AuthUserDto(
+      id: 'apple_456',
+      email: 'apple@scholar.com',
+      username: 'AppleScholar',
+    );
+    return _currentUser!;
+  }
+
+  @override
+  Future<AuthUserDto> signInWithPhone(String phoneNumber) async {
+    await Future<void>.delayed(const Duration(seconds: 2));
+    _currentUser = AuthUserDto(
+      id: 'phone_789',
+      email: 'phone@soteria.app',
+      username: 'PhoneUser_$phoneNumber',
+    );
+    return _currentUser!;
+  }
+
+  @override
   Future<AuthUserDto> signInAsGuest() async {
     await Future<void>.delayed(const Duration(milliseconds: 500));
     _currentUser = const AuthUserDto(
@@ -72,8 +105,41 @@ class MockAuthenticationDataSource implements AuthenticationDataSource {
   @override
   Future<bool> checkUsernameAvailability(String username) async {
     await Future<void>.delayed(const Duration(milliseconds: 500));
-    // Simple mock logic: 'admin' and 'soteria' are taken.
     final taken = ['admin', 'soteria'].contains(username.toLowerCase());
     return !taken;
+  }
+
+  @override
+  Future<void> linkProvider(String providerId) async {
+    await Future<void>.delayed(const Duration(seconds: 1));
+  }
+
+  @override
+  Future<void> unlinkProvider(String providerId) async {
+    await Future<void>.delayed(const Duration(seconds: 1));
+  }
+
+  // --- Account Recovery Mock ---
+
+  @override
+  Future<void> requestPasswordReset(String email) async {
+    await Future<void>.delayed(const Duration(seconds: 1));
+    if (email == 'notfound@soteria.app') {
+      throw const AuthException('Account not found.');
+    }
+  }
+
+  @override
+  Future<void> verifyRecoveryCode(String email, String code) async {
+    await Future<void>.delayed(const Duration(seconds: 1));
+    // Mock logic: codes starting with 123 are valid.
+    if (!code.startsWith('123')) {
+      throw const AuthException('Invalid verification code.');
+    }
+  }
+
+  @override
+  Future<void> resetPassword(String email, String newPassword, String code) async {
+    await Future<void>.delayed(const Duration(seconds: 1));
   }
 }

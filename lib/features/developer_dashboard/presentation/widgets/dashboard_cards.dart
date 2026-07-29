@@ -84,7 +84,6 @@ class ActionCard extends StatelessWidget {
     return SoteriaCard(
       onTap: onTap,
       padding: const EdgeInsets.all(SoteriaSpacing.s16),
-      color: color?.withValues(alpha: 0.1),
       borderColor: color,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

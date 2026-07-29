@@ -24,7 +24,7 @@ class SoteriaOtpField extends StatelessWidget {
       children: List.generate(
         length,
         (index) => SizedBox(
-          width: 50,
+          width: 45,
           height: 60,
           child: TextFormField(
             enabled: enabled,

@@ -4,42 +4,41 @@ import '../../../core/design_system/previews/design_system_previews.dart';
 import '../../../core/navigation/navigation_destination.dart';
 import '../../../core/navigation/bottom_navigation.dart';
 import '../../../core/navigation/navigation_rail.dart';
-import '../../../core/feature_flags/feature_flag.dart';
-import '../../../core/feature_flags/feature_flag_group.dart';
-import '../../../core/widgets/feature_flags/feature_flag_card.dart';
 import '../../../core/widgets/splash_screen.dart';
 import '../../../core/widgets/buttons/soteria_button.dart';
-import '../../../core/widgets/buttons/soteria_icon_button.dart';
-import '../../../core/widgets/cards/soteria_card.dart';
 import '../../../core/widgets/cards/soteria_stat_card.dart';
 import '../../../core/widgets/cards/soteria_reward_card.dart';
 import '../../../core/widgets/inputs/soteria_text_field.dart';
 import '../../../core/widgets/inputs/soteria_otp_field.dart';
 import '../../../core/widgets/inputs/soteria_search_field.dart';
-import '../../../core/widgets/inputs/soteria_inputs.dart';
-import '../../../core/widgets/badges/soteria_badge.dart';
 import '../../../core/widgets/avatars/soteria_avatar.dart';
 import '../../../core/widgets/dialogs/soteria_dialogs.dart';
-import '../../../core/widgets/bottom_sheets/soteria_bottom_sheets.dart';
 import '../../../core/widgets/loading/soteria_loading.dart';
 import '../../../core/widgets/empty/soteria_empty_state.dart';
-import '../../../core/widgets/error/soteria_error_state.dart';
 import '../../../core/widgets/error/soteria_error_view.dart';
-import '../../../core/widgets/error/soteria_maintenance_view.dart';
-import '../../../core/widgets/lists/soteria_list_tile.dart';
-import '../../../core/widgets/indicators/soteria_progress.dart';
 import '../../../core/widgets/indicators/gamification_widgets.dart';
-import '../../../core/widgets/containers/soteria_placeholder_screen.dart';
+import '../../auth/presentation/widgets/session/expired_session_dialog.dart';
 import '../../onboarding/presentation/screens/onboarding_screen.dart';
 import '../../onboarding/presentation/widgets/onboarding_illustration.dart';
-import '../../onboarding/presentation/widgets/onboarding_page_widget.dart';
+import '../../auth/presentation/widgets/guest/guest_banner.dart';
+import '../../auth/presentation/widgets/guest/upgrade_dialog.dart';
+import '../../auth/presentation/widgets/guest/restricted_feature_card.dart';
+import '../../auth/presentation/widgets/guest/guest_badge.dart';
 import '../../personalization/presentation/screens/personalization_screen.dart';
+import '../../auth/domain/entities/auth_user.dart';
+import '../../auth/domain/entities/auth_token.dart';
+import '../../auth/domain/entities/session.dart';
+import '../../auth/domain/entities/session_status.dart';
+import '../../auth/domain/entities/auth_provider_type.dart';
 import '../../auth/presentation/screens/login_screen.dart';
 import '../../auth/presentation/screens/register_screen.dart';
 import '../../auth/presentation/screens/forgot_password_screen.dart';
-import '../../auth/presentation/widgets/registration/password_strength_meter.dart';
-import '../../auth/presentation/widgets/registration/requirement_checklist.dart';
-import '../../auth/presentation/widgets/registration/username_availability_card.dart';
+import '../../auth/presentation/screens/verify_code_screen.dart';
+import '../../auth/presentation/screens/reset_password_screen.dart';
+import '../../auth/presentation/screens/recovery_success_screen.dart';
+import '../../auth/presentation/screens/social_login_screen.dart';
+import '../../auth/presentation/widgets/session/session_status_card.dart';
+import '../../auth/presentation/widgets/social_auth_buttons.dart';
 import '../../developer_dashboard/presentation/screens/developer_dashboard_screen.dart';
 import '../../developer_dashboard/presentation/screens/log_viewer_screen.dart';
 import '../../developer_dashboard/presentation/screens/feature_flags_screen.dart';
@@ -47,9 +46,6 @@ import '../../developer_dashboard/presentation/screens/analytics_screen.dart';
 import '../../developer_dashboard/presentation/screens/performance_screen.dart';
 import '../../developer_dashboard/presentation/screens/accessibility_screen.dart';
 import '../../developer_dashboard/presentation/screens/validation_screen.dart';
-import '../../home/presentation/screens/home_screen.dart';
-import '../../practice/practice_screen.dart';
-import '../../versus/versus_screen.dart';
 import '../domain/entities/preview_item.dart';
 
 /// Centralized registry for all Developer Preview items.
@@ -57,136 +53,20 @@ class PreviewRegistry {
   /// Returns the complete list of preview categories and their items.
   static List<PreviewCategory> get categories => [
         _designSystemCategory,
-        _navigationCategory,
         _actionCategory,
         _cardCategory,
         _inputCategory,
         _displayCategory,
         _feedbackCategory,
         _stateCategory,
-        _navigationCategory,
         _onboardingCategory,
         _personalizationCategory,
         _authRegistrationCategory,
+        _guestModeCategory,
+        _sessionManagementCategory,
+        _navigationCategory,
         _infrastructureCategory,
-        _featureScreensCategory,
-        _developerToolsCategory,
       ];
-
-  static final _onboardingCategory = PreviewCategory(
-    id: 'onboarding',
-    name: 'Onboarding Flow',
-    icon: Icons.auto_awesome_outlined,
-    items: [
-      PreviewItem(
-        id: 'onboarding_full',
-        name: 'Full Walkthrough',
-        builder: (_) => const OnboardingScreen(),
-      ),
-      PreviewItem(
-        id: 'onboarding_page_1',
-        name: 'Page 1: Welcome',
-        builder: (_) => const OnboardingPageWidget(
-          title: 'Learn. Compete. Become Legendary.',
-          description: "Africa's competitive learning platform where knowledge becomes achievement.",
-          illustrationType: OnboardingIllustrationType.hero,
-        ),
-      ),
-      PreviewItem(
-        id: 'onboarding_page_2',
-        name: 'Page 2: Practice',
-        builder: (_) => const OnboardingPageWidget(
-          title: 'Practice Every Day',
-          description: "Sharpen your skills with daily challenges, earn XP, Coins, and collect exclusive badges.",
-          illustrationType: OnboardingIllustrationType.practice,
-        ),
-      ),
-    ],
-  );
-
-  static final _personalizationCategory = PreviewCategory(
-    id: 'personalization',
-    name: 'User Personalization',
-    icon: Icons.psychology_outlined,
-    items: [
-      PreviewItem(
-        id: 'personalization_full',
-        name: 'Full Flow',
-        builder: (_) => const PersonalizationScreen(),
-      ),
-    ],
-  );
-
-  static final _authRegistrationCategory = PreviewCategory(
-    id: 'auth_registration',
-    name: 'Auth & Registration',
-    icon: Icons.person_add_outlined,
-    items: [
-      PreviewItem(
-        id: 'register_full',
-        name: 'Full Registration Flow',
-        builder: (_) => const RegisterScreen(),
-      ),
-      PreviewItem(
-        id: 'password_strength',
-        name: 'Password Strength Meter',
-        builder: (_) => const Center(
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: PasswordStrengthMeter(password: 'Pass123!'),
-          ),
-        ),
-      ),
-      PreviewItem(
-        id: 'req_checklist',
-        name: 'Requirement Checklist',
-        builder: (_) => const Center(
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: RequirementChecklist(password: 'pass'),
-          ),
-        ),
-      ),
-      PreviewItem(
-        id: 'username_card',
-        name: 'Username Availability',
-        builder: (_) => const Center(
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: UsernameAvailabilityCard(username: 'scholar', isAvailable: true, isChecking: false),
-          ),
-        ),
-      ),
-    ],
-  );
-
-  static final _infrastructureCategory = PreviewCategory(
-    id: 'infrastructure',
-    name: 'Infrastructure Widgets',
-    icon: Icons.settings_input_component_outlined,
-    items: [
-      PreviewItem(
-        id: 'feature_flag_card',
-        name: 'Feature Flag Card',
-        builder: (_) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: FeatureFlagCard(
-              flag: const FeatureFlag(
-                id: 'preview_flag',
-                name: 'Sample Feature',
-                description: 'This is a description of how the feature flag works in the system.',
-                category: FeatureCategory.experimental,
-                defaultValue: false,
-              ),
-              onToggle: () {},
-              onReset: () {},
-            ),
-          ),
-        ),
-      ),
-    ],
-  );
 
   static final _designSystemCategory = PreviewCategory(
     id: 'design_system',
@@ -195,88 +75,23 @@ class PreviewRegistry {
     items: [
       PreviewItem(
         id: 'colors',
-        name: 'Colors',
+        name: 'Color Palette',
         builder: (_) => const ColorPreview(),
-        tags: const ['palette', 'theme', 'tokens'],
       ),
       PreviewItem(
         id: 'typography',
         name: 'Typography',
         builder: (_) => const TypographyPreview(),
-        tags: const ['text', 'fonts', 'styles'],
       ),
       PreviewItem(
         id: 'spacing',
-        name: 'Spacing',
+        name: 'Spacing System',
         builder: (_) => const SpacingPreview(),
-        tags: const ['padding', 'margins', 'layout'],
       ),
       PreviewItem(
         id: 'radius',
-        name: 'Radius',
+        name: 'Radius System',
         builder: (_) => const RadiusPreview(),
-        tags: const ['corners', 'shape'],
-      ),
-      PreviewItem(
-        id: 'elevation_shadows',
-        name: 'Elevation & Shadows',
-        builder: (_) => const ElevationPreview(),
-        tags: const ['depth', 'z-index'],
-      ),
-      PreviewItem(
-        id: 'animations_ds',
-        name: 'Animation Tokens',
-        builder: (_) => const AnimationPreview(),
-        tags: const ['motion', 'curves', 'transitions'],
-      ),
-      PreviewItem(
-        id: 'icons',
-        name: 'Icons',
-        builder: (_) => const IconPreview(),
-        tags: const ['assets', 'glyph'],
-      ),
-    ],
-  );
-
-  static final _navigationCategory = PreviewCategory(
-    id: 'navigation',
-    name: 'Navigation Shell',
-    icon: Icons.navigation_outlined,
-    items: [
-      PreviewItem(
-        id: 'bottom_nav',
-        name: 'Bottom Navigation',
-        builder: (_) => Scaffold(
-          bottomNavigationBar: SoteriaBottomNavigation(
-            currentIndex: 0,
-            onDestinationSelected: (_) {},
-            destinations: appDestinations.take(5).toList(),
-          ),
-        ),
-      ),
-      PreviewItem(
-        id: 'nav_rail',
-        name: 'Navigation Rail',
-        builder: (_) => Scaffold(
-          body: Row(
-            children: [
-              SoteriaNavigationRail(
-                currentIndex: 0,
-                onDestinationSelected: (_) {},
-                destinations: appDestinations.take(5).toList(),
-              ),
-              const Expanded(child: Center(child: Text('Content Area'))),
-            ],
-          ),
-        ),
-      ),
-      PreviewItem(
-        id: 'placeholder_screen',
-        name: 'Placeholder Screen',
-        builder: (_) => const SoteriaPlaceholderScreen(
-          title: 'Coming Soon',
-          description: 'This feature is currently under active development.',
-        ),
       ),
     ],
   );
@@ -287,35 +102,55 @@ class PreviewRegistry {
     icon: Icons.touch_app_outlined,
     items: [
       PreviewItem(
-        id: 'buttons_primary',
+        id: 'primary_button',
         name: 'Primary Button',
-        builder: (_) => Center(child: SoteriaButton(label: 'PRIMARY', onPressed: () {})),
+        builder: (_) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SoteriaButton(label: 'PRIMARY ACTION', onPressed: () {}),
+          ),
+        ),
       ),
       PreviewItem(
-        id: 'buttons_reward',
-        name: 'Reward Button',
-        builder: (_) => Center(child: SoteriaButton(label: 'CLAIM REWARD', type: SoteriaButtonType.reward, icon: SoteriaIcons.reward, onPressed: () {})),
+        id: 'secondary_button',
+        name: 'Secondary Button',
+        builder: (_) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SoteriaButton(
+              label: 'SECONDARY ACTION',
+              type: SoteriaButtonType.secondary,
+              onPressed: () {},
+            ),
+          ),
+        ),
       ),
       PreviewItem(
-        id: 'buttons_outlined',
+        id: 'outlined_button',
         name: 'Outlined Button',
-        builder: (_) => Center(child: SoteriaButton(label: 'OUTLINED', type: SoteriaButtonType.outlined, onPressed: () {})),
+        builder: (_) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SoteriaButton(
+              label: 'OUTLINED ACTION',
+              type: SoteriaButtonType.outlined,
+              onPressed: () {},
+            ),
+          ),
+        ),
       ),
       PreviewItem(
-        id: 'buttons_destructive',
-        name: 'Destructive Button',
-        builder: (_) => Center(child: SoteriaButton(label: 'DELETE', type: SoteriaButtonType.destructive, icon: SoteriaIcons.delete, onPressed: () {})),
-      ),
-      PreviewItem(
-        id: 'icon_buttons',
-        name: 'Icon Buttons',
-        builder: (_) => const Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SoteriaIconButton(icon: SoteriaIcons.refresh, onPressed: null),
-              SoteriaIconButton(icon: SoteriaIcons.add, backgroundColor: SoteriaColors.primaryLight, color: Colors.white, onPressed: null),
-            ],
+        id: 'reward_button',
+        name: 'Reward Button (Gold)',
+        builder: (_) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SoteriaButton(
+              label: 'COLLECT REWARD',
+              type: SoteriaButtonType.reward,
+              icon: SoteriaIcons.reward,
+              onPressed: () {},
+            ),
           ),
         ),
       ),
@@ -324,135 +159,100 @@ class PreviewRegistry {
 
   static final _cardCategory = PreviewCategory(
     id: 'cards',
-    name: 'Cards',
+    name: 'Cards & Containers',
     icon: Icons.layers_outlined,
     items: [
       PreviewItem(
-        id: 'card_standard',
-        name: 'Standard Card',
-        builder: (_) => const SoteriaCard(child: Text('Standard Card')),
-      ),
-      PreviewItem(
-        id: 'card_glass',
-        name: 'Glass Card',
-        builder: (_) => Center(
-          child: Container(
-            width: double.infinity,
-            height: 200,
-            decoration: const BoxDecoration(
-              image: DecorationImage(image: NetworkImage('https://picsum.photos/400/200'), fit: BoxFit.cover),
-            ),
-            child: const Center(
-              child: SoteriaCard(isGlass: true, child: Text('Glass Card Over Image', style: TextStyle(color: Colors.white))),
+        id: 'stat_card',
+        name: 'Stat Card',
+        builder: (_) => const Center(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: SoteriaStatCard(
+              label: 'Current XP',
+              value: '12,450',
+              icon: SoteriaIcons.streak,
+              trend: '+15%',
             ),
           ),
         ),
       ),
       PreviewItem(
-        id: 'card_stat',
-        name: 'Statistic Card',
-        builder: (_) => const SoteriaStatCard(label: 'Win Rate', value: '84%', icon: Icons.trending_up, trend: '+2.4%'),
-      ),
-      PreviewItem(
-        id: 'card_reward',
+        id: 'reward_card',
         name: 'Reward Card',
-        builder: (_) => const SoteriaRewardCard(title: 'Mission Complete', reward: '500 COINS', icon: SoteriaIcons.reward),
+        builder: (_) => const Center(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: SoteriaRewardCard(
+              title: 'Elite Scholar',
+              reward: '500 COINS',
+              icon: SoteriaIcons.badge,
+            ),
+          ),
+        ),
       ),
     ],
   );
 
   static final _inputCategory = PreviewCategory(
     id: 'inputs',
-    name: 'Forms & Inputs',
-    icon: Icons.input_outlined,
+    name: 'Inputs & Forms',
+    icon: Icons.edit_note_outlined,
     items: [
       PreviewItem(
-        id: 'input_text',
-        name: 'Text Fields',
+        id: 'text_field',
+        name: 'Standard Text Field',
         builder: (_) => const Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            children: [
-              SoteriaTextField(label: 'Username', hintText: 'Enter username'),
-              SizedBox(height: 16),
-              SoteriaTextField(label: 'Password', type: SoteriaTextFieldType.password, suffixIcon: Icon(SoteriaIcons.visibilityOff)),
-            ],
+          padding: EdgeInsets.all(16.0),
+          child: SoteriaTextField(
+            label: 'Username',
+            hintText: 'Enter your scholar name',
+            prefixIcon: Icon(Icons.person_outline),
           ),
         ),
       ),
       PreviewItem(
-        id: 'input_otp',
-        name: 'OTP Field',
-        builder: (_) => const Padding(padding: EdgeInsets.all(16), child: SoteriaOtpField(length: 4)),
-      ),
-      PreviewItem(
-        id: 'input_search',
-        name: 'Search Field',
-        builder: (_) => const Padding(padding: EdgeInsets.all(16), child: SoteriaSearchField()),
-      ),
-      PreviewItem(
-        id: 'input_selection',
-        name: 'Selection Controls',
-        builder: (_) => Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              SoteriaSwitch(label: 'Dark Mode', value: true, onChanged: (_) {}),
-              SoteriaCheckbox(label: 'Accept Terms', value: true, onChanged: (_) {}),
-              SoteriaSlider(label: 'Volume', value: 50, onChanged: (_) {}),
-            ],
+        id: 'otp_field',
+        name: 'OTP Input Field',
+        builder: (_) => const Center(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: SoteriaOtpField(length: 6),
           ),
+        ),
+      ),
+      PreviewItem(
+        id: 'search_field',
+        name: 'Search Field',
+        builder: (_) => const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: SoteriaSearchField(hintText: 'Search subjects...'),
         ),
       ),
     ],
   );
 
   static final _displayCategory = PreviewCategory(
-    id: 'data_display',
+    id: 'display',
     name: 'Data Display',
     icon: Icons.visibility_outlined,
     items: [
       PreviewItem(
-        id: 'display_badges',
-        name: 'Badges & Tags',
-        builder: (_) => const Padding(
-          padding: EdgeInsets.all(16),
-          child: Wrap(
-            spacing: 8,
-            children: [
-              SoteriaBadge(label: 'LIVE', type: SoteriaBadgeType.error, icon: Icons.circle),
-              SoteriaBadge(label: 'LEVEL 12', type: SoteriaBadgeType.level),
-              SoteriaTag(label: 'HARD', color: Colors.red),
-            ],
+        id: 'avatar',
+        name: 'Soteria Avatar',
+        builder: (_) => const Center(
+          child: SoteriaAvatar(
+            size: 80,
+            isOnline: true,
           ),
         ),
       ),
       PreviewItem(
-        id: 'display_avatars',
-        name: 'Avatars',
+        id: 'xp_progress',
+        name: 'XP Progress Bar',
         builder: (_) => const Padding(
-          padding: EdgeInsets.all(16),
-          child: Wrap(
-            spacing: 16,
-            children: [
-              SoteriaAvatar(initials: 'JD', showStatus: true, isOnline: true),
-              SoteriaAvatar(imageUrl: 'https://i.pravatar.cc/150?u=1', size: 64),
-            ],
-          ),
-        ),
-      ),
-      PreviewItem(
-        id: 'display_progress',
-        name: 'Progress Indicators',
-        builder: (_) => const Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            children: [
-              SoteriaLinearProgress(value: 0.7),
-              SizedBox(height: 24),
-              XPProgressBar(progress: 0.65, level: 12),
-            ],
-          ),
+          padding: EdgeInsets.all(16.0),
+          child: XPProgressBar(progress: 0.65, level: 12),
         ),
       ),
     ],
@@ -464,39 +264,19 @@ class PreviewRegistry {
     icon: Icons.feedback_outlined,
     items: [
       PreviewItem(
-        id: 'feedback_dialogs',
-        name: 'Dialogs',
+        id: 'success_dialog',
+        name: 'Success Dialog',
         builder: (context) => Center(
           child: SoteriaButton(
-            label: 'SHOW DIALOG',
+            label: 'SHOW SUCCESS',
+            type: SoteriaButtonType.success,
             onPressed: () => showDialog<void>(
               context: context,
               builder: (_) => const SoteriaDialog(
-                title: 'Confirm Action',
-                message: 'Are you sure you want to proceed with this high-stakes duel?',
-                cancelLabel: 'CANCEL',
-                confirmLabel: 'LET\'S GO',
-              ),
-            ),
-          ),
-        ),
-      ),
-      PreviewItem(
-        id: 'feedback_sheets',
-        name: 'Bottom Sheets',
-        builder: (context) => Center(
-          child: SoteriaButton(
-            label: 'SHOW SHEET',
-            onPressed: () => showModalBottomSheet<void>(
-              context: context,
-              builder: (_) => SoteriaBottomSheet(
-                title: 'Select Item',
-                child: Column(
-                  children: [
-                    SoteriaListTile(title: 'Option 1', onTap: () {}),
-                    SoteriaListTile(title: 'Option 2', onTap: () {}),
-                  ],
-                ),
+                title: 'Achievement Unlocked!',
+                message: 'You have completed the first module.',
+                icon: Icons.verified_rounded,
+                iconColor: SoteriaColors.success,
               ),
             ),
           ),
@@ -507,149 +287,326 @@ class PreviewRegistry {
 
   static final _stateCategory = PreviewCategory(
     id: 'states',
-    name: 'States & Errors',
-    icon: Icons.hourglass_empty_outlined,
+    name: 'App States',
+    icon: Icons.cloud_off_outlined,
     items: [
       PreviewItem(
-        id: 'state_loading',
-        name: 'Loading States',
-        builder: (_) => const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SoteriaCircularLoader(),
-            SizedBox(height: 24),
-            SoteriaSkeleton(height: 20, width: 200),
-            SizedBox(height: 16),
-            SoteriaSkeleton(height: 100),
-          ],
+        id: 'loading',
+        name: 'Loading State',
+        builder: (_) => const Center(child: SoteriaCircularLoader()),
+      ),
+      PreviewItem(
+        id: 'empty',
+        name: 'Empty State',
+        builder: (_) => const SoteriaEmptyState(
+          title: 'No Tournaments Yet',
+          message: 'Check back later for new events.',
+          icon: SoteriaIcons.trophy,
         ),
       ),
       PreviewItem(
-        id: 'state_empty',
-        name: 'Empty States',
-        builder: (_) => SoteriaEmptyState.noInternet(),
-      ),
-      PreviewItem(
-        id: 'state_error_standard',
-        name: 'Error State (Standard)',
-        builder: (_) => const SoteriaErrorState(message: 'A secure connection could not be established.'),
-      ),
-      PreviewItem(
-        id: 'state_error_view',
-        name: 'Error View (Full Screen)',
+        id: 'error',
+        name: 'Error View',
         builder: (_) => const SoteriaErrorView(
-          message: 'The Arena is temporarily unavailable due to a critical surge in academic energy.',
-          type: SoteriaErrorType.fatal,
-          onActionPressed: null,
+          message: 'Could not connect to the Arena.',
         ),
-      ),
-      PreviewItem(
-        id: 'state_maintenance',
-        name: 'Maintenance Mode',
-        builder: (_) => const SoteriaMaintenanceView(estimatedTime: '2 Hours'),
       ),
     ],
   );
 
-  static final _featureScreensCategory = PreviewCategory(
-    id: 'feature_screens',
-    name: 'Feature Screens',
-    icon: Icons.screenshot_outlined,
+  static final _onboardingCategory = PreviewCategory(
+    id: 'onboarding',
+    name: 'Onboarding',
+    icon: Icons.explore_outlined,
     items: [
       PreviewItem(
-        id: 'home',
-        name: 'Home Dashboard',
-        builder: (_) => const HomeScreen(),
-      ),
-      PreviewItem(
-        id: 'practice',
-        name: 'Practice Mode',
-        builder: (_) => const PracticeScreen(),
-      ),
-      PreviewItem(
-        id: 'versus',
-        name: 'Versus Mode',
-        builder: (_) => const VersusScreen(),
-      ),
-      PreviewItem(
         id: 'splash',
-        name: 'Animated Splash Screen',
+        name: 'Splash Screen',
         builder: (_) => const SplashScreen(),
-        tags: const ['welcome', 'animation', 'entry'],
       ),
       PreviewItem(
-        id: 'onboarding',
-        name: 'Onboarding Walkthrough',
+        id: 'onboarding_flow',
+        name: 'Onboarding Screen',
         builder: (_) => const OnboardingScreen(),
-        tags: const ['welcome', 'tutorial'],
+      ),
+      PreviewItem(
+        id: 'illustration',
+        name: 'Illustration Component',
+        builder: (_) => const Center(
+          child: OnboardingIllustration(
+            type: OnboardingIllustrationType.hero,
+          ),
+        ),
+      ),
+    ],
+  );
+
+  static final _personalizationCategory = PreviewCategory(
+    id: 'personalization',
+    name: 'Personalization',
+    icon: Icons.psychology_outlined,
+    items: [
+      PreviewItem(
+        id: 'personalization_flow',
+        name: 'Personalization Screen',
+        builder: (_) => const PersonalizationScreen(),
+      ),
+    ],
+  );
+
+  static final _authRegistrationCategory = PreviewCategory(
+    id: 'auth_registration',
+    name: 'Authentication',
+    icon: Icons.lock_outline_rounded,
+    items: [
+      PreviewItem(
+        id: 'social_login',
+        name: 'Social Login Screen',
+        builder: (_) => const SocialLoginScreen(),
       ),
       PreviewItem(
         id: 'login',
-        name: 'Login Screen',
+        name: 'Email Login Screen',
         builder: (_) => const LoginScreen(),
-        tags: const ['auth', 'signin'],
+      ),
+      PreviewItem(
+        id: 'register',
+        name: 'Registration Flow',
+        builder: (_) => const RegisterScreen(),
       ),
       PreviewItem(
         id: 'forgot_password',
-        name: 'Forgot Password',
+        name: 'Forgot Password (Email)',
         builder: (_) => const ForgotPasswordScreen(),
         tags: const ['auth', 'recovery'],
       ),
       PreviewItem(
-        id: 'register',
-        name: 'Register Screen',
-        builder: (_) => const RegisterScreen(),
-        tags: const ['auth', 'signup'],
+        id: 'verify_recovery',
+        name: 'Verification Code (OTP)',
+        builder: (_) => const VerifyCodeScreen(),
+        tags: const ['auth', 'otp'],
+      ),
+      PreviewItem(
+        id: 'reset_password',
+        name: 'Create New Password',
+        builder: (_) => const ResetPasswordScreen(),
+        tags: const ['auth', 'reset'],
+      ),
+      PreviewItem(
+        id: 'recovery_success',
+        name: 'Recovery Success',
+        builder: (_) => const RecoverySuccessScreen(),
+        tags: const ['auth', 'success'],
+      ),
+      PreviewItem(
+        id: 'social_buttons',
+        name: 'Social Buttons',
+        builder: (_) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SoteriaSocialButton(provider: AuthProviderType.google, onPressed: () {}),
+                const SizedBox(height: 16),
+                SoteriaSocialButton(provider: AuthProviderType.apple, onPressed: () {}),
+                const SizedBox(height: 16),
+                SoteriaSocialButton(provider: AuthProviderType.phone, onPressed: () {}),
+              ],
+            ),
+          ),
+        ),
       ),
     ],
   );
 
-  static final _developerToolsCategory = PreviewCategory(
-    id: 'developer_tools',
-    name: 'Developer Tools',
-    icon: Icons.bug_report_outlined,
+  static final _guestModeCategory = PreviewCategory(
+    id: 'guest_mode',
+    name: 'Guest Mode',
+    icon: Icons.person_outline_rounded,
     items: [
       PreviewItem(
-        id: 'dashboard',
+        id: 'guest_banner',
+        name: 'Guest Reminder Banner',
+        builder: (_) => GuestBanner(onUpgrade: () {}),
+      ),
+      PreviewItem(
+        id: 'upgrade_dialog',
+        name: 'Upgrade Dialog',
+        builder: (context) => Center(
+          child: SoteriaButton(
+            label: 'SHOW UPGRADE DIALOG',
+            onPressed: () => showUpgradeDialog(context, 'Tournament Arena'),
+          ),
+        ),
+      ),
+      PreviewItem(
+        id: 'restricted_card',
+        name: 'Restricted Feature Card',
+        builder: (_) => const Center(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: RestrictedFeatureCard(
+              title: 'Pro Mode',
+              description: 'Professional exams are for registered scholars.',
+              icon: Icons.star_rounded,
+            ),
+          ),
+        ),
+      ),
+      PreviewItem(
+        id: 'guest_badge',
+        name: 'Guest Badge',
+        builder: (_) => const Center(child: GuestBadge()),
+      ),
+    ],
+  );
+
+  static final _sessionManagementCategory = PreviewCategory(
+    id: 'session_management',
+    name: 'Session Management',
+    icon: Icons.timer_outlined,
+    items: [
+      PreviewItem(
+        id: 'session_card_auth',
+        name: 'Session Card: Authenticated',
+        builder: (_) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SessionStatusCard(
+              session: Session(
+                status: SessionStatus.authenticated,
+                user: const AuthUser(id: '1', email: 'user@soteria.app', username: 'ScholarOne'),
+                token: AuthToken(accessToken: 'abc', expiresAt: DateTime.now().add(const Duration(hours: 1))),
+                lastActivityAt: DateTime.now(),
+              ),
+            ),
+          ),
+        ),
+      ),
+      PreviewItem(
+        id: 'session_card_expired',
+        name: 'Session Card: Expired',
+        builder: (_) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SessionStatusCard(
+              session: Session(
+                status: SessionStatus.expired,
+                user: const AuthUser(id: '1', email: 'user@soteria.app', username: 'ScholarOne'),
+                token: AuthToken(accessToken: 'abc', expiresAt: DateTime.now().subtract(const Duration(hours: 1))),
+                lastActivityAt: DateTime.now().subtract(const Duration(minutes: 45)),
+              ),
+            ),
+          ),
+        ),
+      ),
+      PreviewItem(
+        id: 'expired_dialog',
+        name: 'Expired Session Dialog',
+        builder: (context) => Center(
+          child: SoteriaButton(
+            label: 'SHOW EXPIRED DIALOG',
+            onPressed: () => showExpiredSessionDialog(context),
+          ),
+        ),
+      ),
+    ],
+  );
+
+  static final _navigationCategory = PreviewCategory(
+    id: 'navigation',
+    name: 'Navigation System',
+    icon: Icons.navigation_rounded,
+    items: [
+      PreviewItem(
+        id: 'bottom_nav',
+        name: 'Premium Bottom Navigation',
+        builder: (_) => Scaffold(
+          bottomNavigationBar: SoteriaBottomNavigation(
+            currentIndex: 0,
+            onDestinationSelected: (_) {},
+            destinations: appDestinations,
+          ),
+          body: const Center(child: Text('Navigation Preview')),
+        ),
+      ),
+      PreviewItem(
+        id: 'nav_rail',
+        name: 'Navigation Rail (Tablet)',
+        builder: (_) => Scaffold(
+          body: Row(
+            children: [
+              SoteriaNavigationRail(
+                currentIndex: 0,
+                onDestinationSelected: (_) {},
+                destinations: appDestinations,
+              ),
+              const VerticalDivider(width: 1),
+              const Expanded(child: Center(child: Text('Content Area'))),
+            ],
+          ),
+        ),
+      ),
+      PreviewItem(
+        id: 'nav_rail_extended',
+        name: 'Navigation Rail (Desktop)',
+        builder: (_) => Scaffold(
+          body: Row(
+            children: [
+              SoteriaNavigationRail(
+                currentIndex: 0,
+                onDestinationSelected: (_) {},
+                destinations: appDestinations,
+              ),
+              const VerticalDivider(width: 1),
+              const Expanded(child: Center(child: Text('Content Area'))),
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
+
+  static final _infrastructureCategory = PreviewCategory(
+    id: 'infrastructure',
+    name: 'Infrastructure & Tools',
+    icon: Icons.settings_input_component_outlined,
+    items: [
+      PreviewItem(
+        id: 'developer_dashboard',
         name: 'Developer Dashboard',
         builder: (_) => const DeveloperDashboardScreen(),
-        tags: const ['debug', 'admin', 'info'],
       ),
       PreviewItem(
         id: 'log_viewer',
         name: 'Log Viewer',
         builder: (_) => const LogViewerScreen(),
-        tags: const ['logs', 'debug', 'history'],
       ),
       PreviewItem(
-        id: 'feature_flags_dashboard',
+        id: 'feature_flags',
         name: 'Feature Flags',
         builder: (_) => const FeatureFlagSettingsScreen(),
-        tags: const ['flags', 'config'],
       ),
       PreviewItem(
-        id: 'analytics_dashboard',
-        name: 'Analytics Console',
+        id: 'analytics',
+        name: 'Analytics Dashboard',
         builder: (_) => const AnalyticsDashboardScreen(),
-        tags: const ['events', 'tracking'],
       ),
       PreviewItem(
-        id: 'performance_dashboard',
+        id: 'performance',
         name: 'Performance Monitor',
         builder: (_) => const PerformanceDashboardScreen(),
-        tags: const ['jank', 'fps', 'memory'],
       ),
       PreviewItem(
-        id: 'accessibility_dashboard',
+        id: 'accessibility',
         name: 'Accessibility Tools',
         builder: (_) => const AccessibilityDashboardScreen(),
-        tags: const ['semantics', 'a11y'],
       ),
       PreviewItem(
-        id: 'validation_dashboard',
-        name: 'Quality Validation',
+        id: 'validation',
+        name: 'Data Validation',
         builder: (_) => const ValidationDashboardScreen(),
-        tags: const ['checks', 'tokens'],
       ),
     ],
   );

@@ -60,7 +60,7 @@ class AnalyticsEventCard extends StatelessWidget {
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 10, fontFamily: 'monospace'),
                         children: [
                           TextSpan(text: '${e.key}: ', style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
-                          TextSpan(text: '${e.value}', style: const TextStyle(color: Colors.black87)),
+                          TextSpan(text: '${e.value}', style: const TextStyle(color: SoteriaColors.textPrimary)),
                         ],
                       ),
                     ),

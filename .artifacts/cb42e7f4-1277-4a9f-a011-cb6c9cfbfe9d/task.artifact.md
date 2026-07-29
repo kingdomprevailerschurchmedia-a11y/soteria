@@ -1,0 +1,6 @@
+- `[ ]` Define deep link entities and state.
+- `[ ]` Implement `DeepLinkController` and `DeepLinkService`.
+- `[ ]` Integrate deep link handling into `AppRouter` (GoRouter).
+- `[ ]` Implement validation and security checks for deep link parsing.
+- `[ ]` Add unit and navigation tests.
+- `[ ]` Update documentation and preview gallery.

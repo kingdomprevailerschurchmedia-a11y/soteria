@@ -1,52 +1,34 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:async';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../config/app_config.dart';
 import '../logging/logger_provider.dart';
-import '../feature_flags/feature_flag_provider.dart';
-import '../analytics/analytics_provider.dart';
-import '../analytics/analytics_registry.dart';
-import '../performance/startup_metrics.dart';
-import '../../features/onboarding/presentation/providers/onboarding_provider.dart';
-import '../../features/personalization/presentation/providers/personalization_provider.dart';
-import '../../features/auth/presentation/providers/auth_providers.dart';
-import '../../features/auth/application/auth_controller.dart';
 
-/// Provider that handles the application startup logic.
-/// It initializes all required services before the app is fully ready.
-final appStartupProvider = FutureProvider<AppConfig>((ref) async {
-  // 1. Initialize SharedPreferences
-  final prefs = await SharedPreferences.getInstance();
-  
-  // 2. Initialize Feature Flags
-  await ref.read(featureFlagsProvider.notifier).initialize(prefs);
+part 'startup_service.g.dart';
 
-  // 3. Initialize Analytics
-  final analytics = ref.read(analyticsServiceProvider);
-  await analytics.initialize();
-  await AnalyticsRegistry.registerDefaultProperties(analytics);
+/// Provides the SharedPreferences instance after it has been initialized in main().
+@Riverpod(keepAlive: true)
+SharedPreferences sharedPreferences(Ref ref) {
+  throw UnimplementedError('Override sharedPreferencesProvider in the Root ProviderScope');
+}
 
-  // 4. Initialize Personalization
-  await ref.read(personalizationProvider.notifier).initialize(prefs);
+/// Provides the PackageInfo instance after it has been initialized in main().
+@Riverpod(keepAlive: true)
+PackageInfo packageInfo(Ref ref) {
+  throw UnimplementedError('Override packageInfoProvider in the Root ProviderScope');
+}
 
-  // 5. Initialize Authentication
-  final authRepo = ref.read(authenticationRepositoryProvider);
-  await ref.read(authControllerProvider.notifier).initialize(authRepo);
-
-  // 6. Load Onboarding state
-  final onboardingCompleted = prefs.getBool('onboarding_completed') ?? false;
-  ref.read(onboardingProvider.notifier).setCompleted(onboardingCompleted);
-
-  // 5. Load Environment Variables
-  // In a real app, we might check an env-specific entry point,
-  // but here we default to .env.dev for initial foundation.
+/// Provider that handles secondary application startup logic (like DotEnv).
+@Riverpod(keepAlive: true)
+Future<AppConfig> appStartup(Ref ref) async {
+  // 1. Parallelize secondary I/O
   await dotenv.load(fileName: ".env.dev");
 
-  // 6. Get Package Info
-  final packageInfo = await PackageInfo.fromPlatform();
+  final packageInfo = ref.read(packageInfoProvider);
 
-  // 7. Create AppConfig
+  // 2. Create AppConfig
   final config = AppConfig(
     appName: dotenv.get('APP_NAME', fallback: 'Soteria'),
     version: '${packageInfo.version}+${packageInfo.buildNumber}',
@@ -57,15 +39,12 @@ final appStartupProvider = FutureProvider<AppConfig>((ref) async {
     enableCrashReporting: dotenv.get('ENABLE_CRASH_REPORTING', fallback: 'false') == 'true',
   );
 
-  // 8. Use the centralized logger
+  // 3. Log startup event
   final logger = ref.read(loggerProvider);
-  logger.info('App started in ${config.environment.name} mode, version ${config.version}');
-
-  // 9. Mark startup as complete
-  StartupMetrics.markReady();
+  logger.info('App Startup completed. Environment: ${config.environment.name}', tag: 'System');
 
   return config;
-});
+}
 
 AppEnvironment _getEnvironment(String env) {
   switch (env.toLowerCase()) {

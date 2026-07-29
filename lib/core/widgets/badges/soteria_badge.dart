@@ -61,15 +61,16 @@ class SoteriaBadge extends StatelessWidget {
       case SoteriaBadgeType.premium: return SoteriaColors.primaryLight;
       case SoteriaBadgeType.xp: return SoteriaColors.xpPurple;
       case SoteriaBadgeType.coin: return SoteriaColors.coinGold;
-      case SoteriaBadgeType.level: return Colors.black87;
+      case SoteriaBadgeType.level: return SoteriaColors.accentGold;
     }
   }
 
   Color _getOnColor() {
     switch (type) {
+      case SoteriaBadgeType.level:
       case SoteriaBadgeType.warning:
       case SoteriaBadgeType.coin:
-        return Colors.black87;
+        return SoteriaColors.onAccentGold;
       default:
         return Colors.white;
     }

@@ -3,7 +3,7 @@ import 'bottom_navigation.dart';
 import 'navigation_rail.dart';
 import 'navigation_destination.dart';
 
-/// ResponsiveShell manages the navigation layout based on screen size.
+/// ResponsiveShell manages the navigation layout based on screen size and orientation.
 class ResponsiveShell extends StatelessWidget {
   const ResponsiveShell({
     super.key,
@@ -22,26 +22,11 @@ class ResponsiveShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth >= 1024) {
-          // Desktop/Web
-          return Scaffold(
-            body: Row(
-              children: [
-                SoteriaNavigationRail(
-                  currentIndex: currentIndex,
-                  onDestinationSelected: onDestinationSelected,
-                  destinations: destinations,
-                  extended: true,
-                ),
-                const VerticalDivider(width: 1),
-                Expanded(child: child),
-              ],
-            ),
-          );
-        }
+        final isDesktop = constraints.maxWidth >= 1024;
+        final isTablet = constraints.maxWidth >= 600;
 
-        if (constraints.maxWidth >= 600) {
-          // Tablet
+        // Use Navigation Rail for Tablets and Desktops
+        if (isTablet || isDesktop) {
           return Scaffold(
             body: Row(
               children: [
@@ -57,7 +42,7 @@ class ResponsiveShell extends StatelessWidget {
           );
         }
 
-        // Mobile
+        // Standard Mobile Portrait
         return Scaffold(
           body: child,
           bottomNavigationBar: SoteriaBottomNavigation(

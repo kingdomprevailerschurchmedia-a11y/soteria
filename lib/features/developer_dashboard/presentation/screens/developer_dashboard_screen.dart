@@ -14,6 +14,11 @@ import '../../application/dashboard_providers.dart';
 import '../../domain/entities/app_diagnostics.dart';
 import '../../../../features/personalization/presentation/providers/personalization_provider.dart';
 import '../../../../features/auth/presentation/providers/auth_providers.dart';
+import '../../../../features/auth/application/session_controller.dart';
+import '../../../../features/auth/application/guest_controller.dart';
+import '../../../../features/auth/application/recovery_controller.dart';
+import '../../../../features/auth/domain/entities/auth_provider_type.dart';
+import '../../../../features/auth/domain/entities/auth_provider_capabilities.dart';
 
 /// The main entry point for developer tools and diagnostics.
 class DeveloperDashboardScreen extends ConsumerWidget {
@@ -24,6 +29,9 @@ class DeveloperDashboardScreen extends ConsumerWidget {
     final appDiagAsync = ref.watch(appDiagnosticsProvider);
     final deviceDiag = ref.watch(deviceDiagnosticsProvider);
     final authState = ref.watch(authStateProvider);
+    final session = ref.watch(sessionControllerProvider);
+    final recovery = ref.watch(recoveryControllerProvider);
+    final guestProgress = ref.watch(guestControllerProvider);
 
     return SoteriaScaffold(
       appBar: AppBar(
@@ -43,15 +51,41 @@ class DeveloperDashboardScreen extends ConsumerWidget {
             _buildSectionHeader(context, 'Diagnostics'),
             const SizedBox(height: SoteriaSpacing.s16),
             InfoCard(
+              title: 'Account Recovery',
+              icon: Icons.history_edu_rounded,
+              data: {
+                'Status': recovery.status.name.toUpperCase(),
+                'Target Email': recovery.email ?? 'none',
+                'Countdown': '${recovery.resendCountdown}s',
+                'Verified': recovery.isVerified.toString().toUpperCase(),
+              },
+            ),
+            const SizedBox(height: SoteriaSpacing.s16),
+            InfoCard(
               title: 'Identity & Auth',
               icon: Icons.fingerprint_rounded,
               data: {
                 'Status': authState.status.name.toUpperCase(),
+                'Session': session.status.name.toUpperCase(),
+                'Provider': authState.lastUsedProvider?.name.toUpperCase() ?? 'NONE',
+                'Capabilities': _getCapabilitiesString(authState.lastUsedProvider),
                 'User ID': authState.user?.id ?? 'none',
-                'User Name': authState.user?.username ?? 'none',
                 'Is Guest': authState.user?.isGuest.toString() ?? 'false',
               },
             ),
+            if (authState.isGuest) ...[
+              const SizedBox(height: SoteriaSpacing.s16),
+              InfoCard(
+                title: 'Guest Progress (Local)',
+                icon: Icons.auto_graph_rounded,
+                data: {
+                  'XP': guestProgress.xp.toString(),
+                  'Coins': guestProgress.coins.toString(),
+                  'Quizzes': guestProgress.completedQuizIds.length.toString(),
+                  'Upgrade Eligible': 'YES',
+                },
+              ),
+            ],
             const SizedBox(height: SoteriaSpacing.s16),
             InfoCard(
               title: 'Application',
@@ -211,6 +245,12 @@ class DeveloperDashboardScreen extends ConsumerWidget {
       context: context,
       message: 'Device info copied to clipboard.',
     );
+  }
+
+  String _getCapabilitiesString(AuthProviderType? provider) {
+    if (provider == null) return 'N/A';
+    final caps = AuthProviderCapabilities.capabilities[provider] ?? [];
+    return caps.map((c) => c.name.toUpperCase()).join(', ');
   }
 }
 

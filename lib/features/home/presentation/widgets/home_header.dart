@@ -26,7 +26,7 @@ class HomeHeader extends StatelessWidget {
                 Text(
                   welcomeMessage,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors.grey,
+                        color: SoteriaColors.textSecondary,
                       ),
                 ),
                 const SizedBox(height: SoteriaSpacing.s4),
@@ -34,7 +34,7 @@ class HomeHeader extends StatelessWidget {
                   stats.rank,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor,
+                        color: SoteriaColors.primary,
                       ),
                 ),
               ],

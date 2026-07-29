@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../../core/design_system/design_system.dart';
-import '../../../../core/utils/validators.dart';
-import '../../../../core/widgets/inputs/soteria_text_field.dart';
-import '../../../../core/navigation/navigation_constants.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../../core/design_system/design_system.dart';
+import '../../../../../core/utils/validators.dart';
+import '../../../../../core/widgets/inputs/soteria_text_field.dart';
+import '../../../../../core/navigation/navigation_constants.dart';
 
 /// Modular form component for the login screen.
 class LoginForm extends StatefulWidget {
@@ -13,7 +13,7 @@ class LoginForm extends StatefulWidget {
     this.isLoading = false,
   });
 
-  final Function(String email, String password, bool rememberMe) onLogin;
+  final void Function(String email, String password, bool rememberMe) onLogin;
   final bool isLoading;
 
   @override
@@ -71,7 +71,7 @@ class _LoginFormState extends State<LoginForm> {
               icon: Icon(_isPasswordVisible ? Icons.visibility_off : Icons.visibility),
               onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
             ),
-            validator: (v) => (v == null || v.isEmpty) ? 'Password is required' : null,
+            validator: (String? v) => (v == null || v.isEmpty) ? 'Password is required' : null,
             enabled: !widget.isLoading,
           ),
           const SizedBox(height: SoteriaSpacing.s12),
@@ -102,7 +102,7 @@ class _LoginFormState extends State<LoginForm> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(SoteriaRadius.m)),
             ),
             child: widget.isLoading 
-                ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(strokeWidth: 2))
                 : const Text('LOGIN'),
           ),
         ],

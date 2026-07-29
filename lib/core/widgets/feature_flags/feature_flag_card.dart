@@ -67,7 +67,7 @@ class FeatureFlagCard extends StatelessWidget {
               _StatusBadge(
                 label: 'Default: ${flag.defaultValue ? 'ON' : 'OFF'}',
                 color: Colors.grey.shade200,
-                textColor: Colors.black54,
+                textColor: SoteriaColors.textMuted,
               ),
               if (isOverridden) ...[
                 const SizedBox(width: SoteriaSpacing.s8),

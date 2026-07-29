@@ -1,0 +1,5 @@
+- `[/]` Refine SoteriaBottomNavigation animations and layout
+- `[ ]` Update SoteriaNavigationRail animations and layout
+- `[ ]` Finalize responsive shell logic
+- `[ ]` Implement unit/widget tests
+- `[ ]` Verify against all acceptance criteria
