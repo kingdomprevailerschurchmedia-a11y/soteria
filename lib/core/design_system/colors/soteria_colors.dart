@@ -94,5 +94,6 @@ class SoteriaColors {
   
   static const Color surface = surfaceL1;
   static const Color surfaceContainer = surfaceL2;
+  static const Color surfaceDark = background;
 
 }

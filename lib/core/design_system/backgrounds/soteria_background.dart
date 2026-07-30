@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../colors/soteria_colors.dart';
 
 /// Defines the visual variant for the [SoteriaBackground].
-enum SoteriaBackgroundStyle {
+enum SoteriaBackgroundType {
   /// Standard background for Home, Profile, and general screens.
   standard,
 
@@ -10,22 +10,25 @@ enum SoteriaBackgroundStyle {
   competition,
 
   /// Gold ambient glow for Achievements, Rewards, and Leaderboards.
-  rewards,
+  rewards;
+
+  /// Alias for standard background.
+  static const SoteriaBackgroundType defaultType = standard;
 }
 
 /// A reusable background widget that implements the Soteria v2 premium aesthetic.
 /// 
 /// It applies the multi-stop wallpaper gradient and adds subtle ambient glows
-/// based on the selected [style].
+/// based on the selected [type].
 class SoteriaBackground extends StatelessWidget {
   const SoteriaBackground({
     super.key,
     required this.child,
-    this.style = SoteriaBackgroundStyle.standard,
+    this.type = SoteriaBackgroundType.standard,
   });
 
   final Widget child;
-  final SoteriaBackgroundStyle style;
+  final SoteriaBackgroundType type;
 
   @override
   Widget build(BuildContext context) {
@@ -57,8 +60,8 @@ class SoteriaBackground extends StatelessWidget {
   }
 
   List<Widget> _buildAmbientGlows() {
-    switch (style) {
-      case SoteriaBackgroundStyle.competition:
+    switch (type) {
+      case SoteriaBackgroundType.competition:
         return [
           _GlowLayer(
             alignment: Alignment.topLeft,
@@ -71,7 +74,7 @@ class SoteriaBackground extends StatelessWidget {
             radius: 1.0,
           ),
         ];
-      case SoteriaBackgroundStyle.rewards:
+      case SoteriaBackgroundType.rewards:
         return [
           _GlowLayer(
             alignment: Alignment.center,
@@ -84,7 +87,7 @@ class SoteriaBackground extends StatelessWidget {
             radius: 1.0,
           ),
         ];
-      case SoteriaBackgroundStyle.standard:
+      case SoteriaBackgroundType.standard:
       default:
         return [
           _GlowLayer(
