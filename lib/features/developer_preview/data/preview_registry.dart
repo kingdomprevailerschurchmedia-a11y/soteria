@@ -600,7 +600,7 @@ class PreviewRegistry {
         name: 'XP Progress Bar',
         builder: (_) => const Padding(
           padding: EdgeInsets.all(16.0),
-          child: XPProgressBar(progress: 0.65, level: 12),
+          child: SoteriaXPProgressBar(progress: 0.65, level: 12),
         ),
       ),
     ],

@@ -60,6 +60,52 @@ class ColorPreview extends StatelessWidget {
   }
 }
 
+/// Previews for the Soteria Design System Icons.
+class IconPreview extends StatelessWidget {
+  const IconPreview({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final icons = [
+      ('Primary Action', Icons.bolt_rounded),
+      ('Reward', Icons.emoji_events_rounded),
+      ('Achievement', Icons.workspace_premium_rounded),
+      ('Streak', Icons.local_fire_department_rounded),
+      ('Profile', Icons.person_rounded),
+      ('Settings', Icons.settings_rounded),
+      ('Notification', Icons.notifications_rounded),
+      ('Search', Icons.search_rounded),
+    ];
+
+    return GridView.builder(
+      padding: const EdgeInsets.all(SoteriaSpacing.s16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+      ),
+      itemCount: icons.length,
+      itemBuilder: (context, index) {
+        final icon = icons[index];
+        return Card(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon.$2, size: 32, color: SoteriaColors.primary),
+              const SizedBox(height: 8),
+              Text(
+                icon.$1,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 10),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
 /// Previews for the Soteria Design System Typography.
 class TypographyPreview extends StatelessWidget {
   const TypographyPreview({super.key});

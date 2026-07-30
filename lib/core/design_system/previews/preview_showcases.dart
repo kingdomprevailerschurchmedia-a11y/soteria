@@ -18,7 +18,10 @@ class _BackgroundShowcaseState extends State<BackgroundShowcase> {
     return Stack(
       children: [
         // Full-screen render of the background
-        SoteriaBackground(type: _selectedType),
+        SoteriaBackground(
+          type: _selectedType,
+          child: const SizedBox.expand(),
+        ),
 
         // Control Overlay
         Positioned(
