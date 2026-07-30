@@ -152,6 +152,11 @@ class DeveloperDashboardScreen extends ConsumerWidget {
                   onTap: () => context.pushNamed(NavigationConstants.validationName),
                 ),
                 ActionCard(
+                  title: 'Game Rules',
+                  icon: Icons.gavel_rounded,
+                  onTap: () => context.pushNamed(NavigationConstants.gameRulesName),
+                ),
+                ActionCard(
                   title: 'Clear Prefs',
                   icon: Icons.delete_forever_outlined,
                   color: SoteriaColors.error,

@@ -32,6 +32,7 @@ class NavigationConstants {
   static const String performance = 'performance';
   static const String accessibility = 'accessibility';
   static const String validation = 'validation';
+  static const String gameRules = 'rules';
   static const String loginEmail = 'email';
 
   // Route Names
@@ -63,4 +64,5 @@ class NavigationConstants {
   static const String performanceName = 'performance';
   static const String accessibilityName = 'accessibility';
   static const String validationName = 'validation';
+  static const String gameRulesName = 'rules';
 }

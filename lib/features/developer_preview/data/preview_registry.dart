@@ -66,6 +66,18 @@ import '../../gameplay/domain/entities/assist_status.dart';
 import '../../gameplay/domain/entities/timer_state.dart';
 import '../../gameplay/domain/entities/timer_status.dart';
 import '../../gameplay/domain/entities/timer_profile.dart';
+import '../../multiplayer/presentation/widgets/searching_for_opponent.dart';
+import '../../multiplayer/presentation/widgets/match_ready_dialog.dart';
+import '../../multiplayer/presentation/widgets/multiplayer_widgets.dart';
+import '../../multiplayer/presentation/widgets/ready_check_dialog.dart';
+import '../../multiplayer/presentation/widgets/match_countdown_overlay.dart';
+import '../../multiplayer/presentation/widgets/round_transition_view.dart';
+import '../../multiplayer/presentation/widgets/sync_widgets.dart';
+import '../../multiplayer/domain/models/player.dart';
+import '../../multiplayer/domain/models/player_status.dart';
+import '../../multiplayer/domain/models/connection_models.dart';
+import '../../multiplayer/domain/models/session_models.dart';
+import '../../multiplayer/domain/models/match_types.dart';
 import '../../progression/presentation/widgets/level_badge.dart';
 import '../../progression/presentation/widgets/xp_progress_bar.dart';
 import '../../progression/presentation/widgets/score_card.dart';
@@ -84,6 +96,7 @@ class PreviewRegistry {
   static List<PreviewCategory> get categories => [
         _designSystemCategory,
         _gameplayCategory,
+        _multiplayerCategory,
         _progressionCategory,
         _visualShowcaseCategory,
         _componentStatesCategory,
@@ -342,6 +355,123 @@ class PreviewRegistry {
         name: 'Reward Feedback',
         builder: (_) => const Center(
           child: RewardFeedback(amount: 100, label: 'XP'),
+        ),
+      ),
+    ],
+  );
+
+  static final _multiplayerCategory = PreviewCategory(
+    id: 'multiplayer',
+    name: 'Multiplayer & Matchmaking',
+    icon: Icons.people_outline_rounded,
+    items: [
+      PreviewItem(
+        id: 'searching_radar',
+        name: 'Searching Radar (Queued)',
+        builder: (_) => const ProviderScope(
+          child: SearchingForOpponent(),
+        ),
+      ),
+      PreviewItem(
+        id: 'match_ready',
+        name: 'Match Ready Dialog',
+        builder: (context) => Center(
+          child: SoteriaButton(
+            label: 'Trigger Match Found',
+            onPressed: () => showDialog(
+              context: context,
+              builder: (context) => MatchReadyDialog(
+                players: const [
+                  MatchPlayer(player: Player(id: '1', displayName: 'You', rank: 25)),
+                  MatchPlayer(player: Player(id: '2', displayName: 'CyberKnight', rank: 42)),
+                ],
+                onAccept: () => Navigator.pop(context),
+                onDecline: () => Navigator.pop(context),
+              ),
+            ),
+          ),
+        ),
+      ),
+      PreviewItem(
+        id: 'opponent_card',
+        name: 'Opponent Card',
+        builder: (_) => const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: OpponentCard(
+            player: Player(
+              id: '2',
+              displayName: 'NeonShadow',
+              rank: 12,
+              skillRating: 1100,
+              status: PlayerStatus.online,
+            ),
+            latency: 45,
+          ),
+        ),
+      ),
+      PreviewItem(
+        id: 'connection_status',
+        name: 'Connection Status Indicators',
+        builder: (_) => const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              ConnectionStatusIndicator(state: ConnectionState.connected),
+              SizedBox(height: 8),
+              ConnectionStatusIndicator(state: ConnectionState.connecting),
+              SizedBox(height: 8),
+              ConnectionStatusIndicator(state: ConnectionState.failed),
+            ],
+          ),
+        ),
+      ),
+      PreviewItem(
+        id: 'ready_check',
+        name: 'Ready Check Interface',
+        builder: (_) => ReadyCheckDialog(
+          session: GameSession(
+            sessionId: '1',
+            matchId: 'm1',
+            type: MatchType.oneVsOne,
+            status: SessionStatus.readyCheck,
+            createdAt: DateTime.now(),
+            players: const [
+              PlayerState(playerId: '1', displayName: 'You', isReady: true),
+              PlayerState(playerId: '2', displayName: 'Opponent', isReady: false),
+            ],
+          ),
+        ),
+      ),
+      PreviewItem(
+        id: 'match_countdown',
+        name: 'Match Countdown',
+        builder: (_) => MatchCountdownOverlay(count: 3, onFinished: () {}),
+      ),
+      PreviewItem(
+        id: 'round_transition',
+        name: 'Round Transition View',
+        builder: (_) => const RoundTransitionView(
+          roundCompleted: 1,
+          players: [
+            PlayerState(playerId: '1', displayName: 'You', score: 1200),
+            PlayerState(playerId: '2', displayName: 'Rival', score: 1150),
+          ],
+        ),
+      ),
+      PreviewItem(
+        id: 'sync_indicators',
+        name: 'Sync & Latency Tools',
+        builder: (_) => const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              ConnectionQualityIndicator(),
+              SizedBox(height: 16),
+              SyncStatusBanner(isRecovering: true, progress: 0.75),
+              SizedBox(height: 16),
+              LatencyDetailedOverlay(),
+            ],
+          ),
         ),
       ),
     ],

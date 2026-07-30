@@ -15,6 +15,7 @@ import '../../features/developer_dashboard/presentation/screens/analytics_screen
 import '../../features/developer_dashboard/presentation/screens/performance_screen.dart';
 import '../../features/developer_dashboard/presentation/screens/accessibility_screen.dart';
 import '../../features/developer_dashboard/presentation/screens/validation_screen.dart';
+import '../../features/game_rules/presentation/screens/rules_dashboard_screen.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/social_login_screen.dart';
@@ -252,6 +253,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: NavigationConstants.validation,
             name: NavigationConstants.validationName,
             builder: (context, state) => const ValidationDashboardScreen(),
+          ),
+          GoRoute(
+            path: NavigationConstants.gameRules,
+            name: NavigationConstants.gameRulesName,
+            builder: (context, state) => const RulesDashboardScreen(),
           ),
         ],
       ),
