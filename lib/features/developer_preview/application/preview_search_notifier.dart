@@ -18,9 +18,13 @@ class PreviewSearchNotifier extends _$PreviewSearchNotifier {
 
     return PreviewRegistry.categories.map((category) {
       final filteredItems = category.items.where((item) {
-        final matchesName = item.name.toLowerCase().contains(state);
-        final matchesTags = item.tags.any((tag) => tag.contains(state));
-        return matchesName || matchesTags;
+        final query = state.toLowerCase();
+        final matchesName = item.name.toLowerCase().contains(query);
+        final matchesTags = item.tags.any((tag) => tag.toLowerCase().contains(query));
+        // Search by ID or description if available
+        final matchesId = item.id.toLowerCase().contains(query);
+
+        return matchesName || matchesTags || matchesId;
       }).toList();
 
       return PreviewCategory(
