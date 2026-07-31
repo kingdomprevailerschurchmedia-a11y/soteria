@@ -68,7 +68,7 @@ class HomeScreen extends ConsumerWidget {
       child: Row(
         children: [
           Expanded(
-            child: XPProgressBar(
+            child: SoteriaXPProgressBar(
               progress: stats.xpProgress,
               level: stats.level,
             ),

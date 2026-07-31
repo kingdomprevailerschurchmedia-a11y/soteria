@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/design_system/design_system.dart';
 import '../../../core/design_system/previews/design_system_previews.dart';
+import '../../../core/design_system/previews/preview_showcases.dart';
 import '../../../core/navigation/navigation_destination.dart';
 import '../../../core/navigation/bottom_navigation.dart';
 import '../../../core/navigation/navigation_rail.dart';
@@ -46,13 +47,66 @@ import '../../developer_dashboard/presentation/screens/analytics_screen.dart';
 import '../../developer_dashboard/presentation/screens/performance_screen.dart';
 import '../../developer_dashboard/presentation/screens/accessibility_screen.dart';
 import '../../developer_dashboard/presentation/screens/validation_screen.dart';
+import '../../gameplay/presentation/screens/question_engine_screen.dart';
+import '../../gameplay/presentation/screens/match_flow_screen.dart';
+import '../../gameplay/presentation/widgets/assist_button.dart';
+import '../../gameplay/presentation/widgets/assist_bar.dart';
+import '../../gameplay/presentation/widgets/countdown_overlay.dart';
+import '../../gameplay/presentation/widgets/soteria_timer.dart';
+import '../../gameplay/presentation/widgets/difficulty_badge.dart';
+import '../../gameplay/presentation/widgets/category_indicator.dart';
+import '../../gameplay/presentation/widgets/feedback_overlay.dart';
+import '../../gameplay/presentation/widgets/reward_feedback.dart';
+import '../../gameplay/presentation/widgets/option_tile.dart';
+import '../../gameplay/domain/entities/question_option.dart';
+import '../../gameplay/domain/entities/question_difficulty.dart';
+import '../../gameplay/domain/entities/assist_usage.dart';
+import '../../gameplay/domain/entities/assist_type.dart';
+import '../../gameplay/domain/entities/assist_status.dart';
+import '../../gameplay/domain/entities/timer_state.dart';
+import '../../gameplay/domain/entities/timer_status.dart';
+import '../../gameplay/domain/entities/timer_profile.dart';
+import '../../multiplayer/presentation/widgets/searching_for_opponent.dart';
+import '../../multiplayer/presentation/widgets/match_ready_dialog.dart';
+import '../../multiplayer/presentation/widgets/multiplayer_widgets.dart';
+import '../../multiplayer/presentation/widgets/ready_check_dialog.dart';
+import '../../multiplayer/presentation/widgets/match_countdown_overlay.dart';
+import '../../multiplayer/presentation/widgets/round_transition_view.dart';
+import '../../multiplayer/presentation/widgets/sync_widgets.dart';
+import '../../multiplayer/domain/models/player.dart';
+import '../../multiplayer/domain/models/player_status.dart';
+import '../../multiplayer/domain/models/connection_models.dart';
+import '../../multiplayer/domain/models/session_models.dart';
+import '../../multiplayer/domain/models/match_types.dart';
+import '../../progression/presentation/widgets/level_badge.dart';
+import '../../progression/presentation/widgets/xp_progress_bar.dart';
+import '../../progression/presentation/widgets/score_card.dart';
+import '../../gameplay/presentation/widgets/fair_play_indicator.dart';
 import '../domain/entities/preview_item.dart';
 
 /// Centralized registry for all Developer Preview items.
 class PreviewRegistry {
+  /// Internal store for dynamically registered items.
+  static final List<PreviewItem> _dynamicItems = [];
+
+  /// Helper to register a component preview from anywhere in the app (Debug only).
+  static void register(PreviewItem item) => _dynamicItems.add(item);
+
   /// Returns the complete list of preview categories and their items.
   static List<PreviewCategory> get categories => [
         _designSystemCategory,
+        _gameplayCategory,
+        _multiplayerCategory,
+        _progressionCategory,
+        _visualShowcaseCategory,
+        _componentStatesCategory,
+        if (_dynamicItems.isNotEmpty)
+          PreviewCategory(
+            id: 'dynamic',
+            name: 'Recently Registered',
+            icon: Icons.add_circle_outline,
+            items: _dynamicItems,
+          ),
         _actionCategory,
         _cardCategory,
         _inputCategory,
@@ -66,35 +120,459 @@ class PreviewRegistry {
         _sessionManagementCategory,
         _navigationCategory,
         _infrastructureCategory,
+        _goldenTestCategory,
       ];
 
-  static final _designSystemCategory = PreviewCategory(
-    id: 'design_system',
-    name: 'Design System',
-    icon: Icons.palette_outlined,
+  static final _goldenTestCategory = PreviewCategory(
+    id: 'golden_tests',
+    name: 'Golden Test Viewer',
+    icon: Icons.image_search_rounded,
     items: [
       PreviewItem(
-        id: 'colors',
-        name: 'Color Palette',
-        builder: (_) => const ColorPreview(),
-      ),
-      PreviewItem(
-        id: 'typography',
-        name: 'Typography',
-        builder: (_) => const TypographyPreview(),
-      ),
-      PreviewItem(
-        id: 'spacing',
-        name: 'Spacing System',
-        builder: (_) => const SpacingPreview(),
-      ),
-      PreviewItem(
-        id: 'radius',
-        name: 'Radius System',
-        builder: (_) => const RadiusPreview(),
+        id: 'golden_home',
+        name: 'Home Screen (Golden)',
+        builder: (_) => const Center(child: Icon(Icons.image, size: 100, color: Colors.grey)),
+        description: 'Mock of a generated golden test image',
       ),
     ],
   );
+
+  static final _designSystemCategory = PreviewCategory(
+    id: 'design_tokens',
+    name: 'Design Tokens',
+    icon: Icons.token_outlined,
+    items: [
+      PreviewItem(id: 'colors', name: 'Color Palette', builder: (_) => const ColorPreview()),
+      PreviewItem(id: 'typography', name: 'Typography', builder: (_) => const TypographyPreview()),
+      PreviewItem(id: 'spacing', name: 'Spacing System', builder: (_) => const SpacingPreview()),
+      PreviewItem(id: 'elevation', name: 'Elevation & Shadows', builder: (_) => const ElevationPreview()),
+      PreviewItem(id: 'durations', name: 'Animation Durations', builder: (_) => const DurationPreview()),
+      PreviewItem(id: 'icons', name: 'Icon Library', builder: (_) => const IconPreview()),
+    ],
+  );
+
+  static final _gameplayCategory = PreviewCategory(
+    id: 'gameplay_engine',
+    name: 'Gameplay Engine',
+    icon: Icons.sports_esports_outlined,
+    items: [
+      PreviewItem(
+        id: 'match_flow',
+        name: 'Match Flow Engine',
+        builder: (_) => const MatchFlowScreen(mode: 'practice'),
+        description: 'Orchestrates the entire match lifecycle.',
+      ),
+      PreviewItem(
+        id: 'question_engine',
+        name: 'Question Engine (Architecture)',
+        builder: (_) => const QuestionEngineScreen(),
+        description: 'The core reusable engine for all gameplay modes.',
+      ),
+      PreviewItem(
+        id: 'countdown_overlay',
+        name: 'Countdown Overlay',
+        builder: (_) => const CountdownOverlay(count: 3),
+      ),
+      PreviewItem(
+        id: 'timer_widgets',
+        name: 'Timer Visualizations',
+        builder: (_) {
+          const profile = TimerProfile(id: 'test', name: 'Test', maxDurationSeconds: 30);
+          final running = TimerState(sessionId: '1', profile: profile, status: TimerStatus.running, remainingSeconds: 20);
+          final critical = TimerState(sessionId: '1', profile: profile, status: TimerStatus.critical, remainingSeconds: 3);
+          final frozen = TimerState(sessionId: '1', profile: profile, status: TimerStatus.frozen, remainingSeconds: 15, isFrozen: true);
+          
+          return Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Circular Timer (Running)'),
+                const SizedBox(height: 16),
+                CircularTimer(timerState: running),
+                const SizedBox(height: 32),
+                const Text('Circular Timer (Critical + Pulse)'),
+                const SizedBox(height: 16),
+                CircularTimer(timerState: critical),
+                const SizedBox(height: 32),
+                const Text('Linear Timer (Frozen)'),
+                const SizedBox(height: 16),
+                LinearTimer(timerState: frozen),
+              ],
+            ),
+          );
+        },
+      ),
+      PreviewItem(
+        id: 'assist_buttons',
+        name: 'Knowledge Assist Buttons',
+        builder: (_) => Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Available State'),
+              const SizedBox(height: 8),
+              AssistButton(
+                usage: const AssistUsage(id: '1', type: AssistType.eliminateTwo),
+                onTap: () {},
+              ),
+              const SizedBox(height: 16),
+              const Text('Used State'),
+              const SizedBox(height: 8),
+              AssistButton(
+                usage: const AssistUsage(
+                  id: '2', 
+                  type: AssistType.timeFreeze, 
+                  status: AssistStatus.used
+                ),
+                onTap: () {},
+              ),
+              const SizedBox(height: 16),
+              const Text('Loading State'),
+              const SizedBox(height: 8),
+              AssistButton(
+                usage: const AssistUsage(id: '3', type: AssistType.communityInsight),
+                onTap: () {},
+                isLoading: true,
+              ),
+            ],
+          ),
+        ),
+      ),
+      PreviewItem(
+        id: 'assist_bar',
+        name: 'Knowledge Assist Bar',
+        builder: (_) => const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: AssistBar(),
+        ),
+      ),
+      PreviewItem(
+        id: 'difficulty_badges',
+        name: 'Difficulty Badges',
+        builder: (_) => const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              DifficultyBadge(difficulty: QuestionDifficulty.beginner),
+              SizedBox(height: 8),
+              DifficultyBadge(difficulty: QuestionDifficulty.intermediate),
+              SizedBox(height: 8),
+              DifficultyBadge(difficulty: QuestionDifficulty.advanced),
+              SizedBox(height: 8),
+              DifficultyBadge(difficulty: QuestionDifficulty.elite),
+            ],
+          ),
+        ),
+      ),
+      PreviewItem(
+        id: 'category_indicator',
+        name: 'Category Indicator',
+        builder: (_) => const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: CategoryIndicator(categories: ['Blockchain', 'Security', 'Web3']),
+        ),
+      ),
+      PreviewItem(
+        id: 'gameplay_status_matrix',
+        name: 'Gameplay System Status',
+        builder: (_) => ListView(
+          padding: const EdgeInsets.all(16),
+          children: const [
+            Text('Validated Systems:'),
+            Divider(),
+            ListTile(title: Text('Question Engine'), trailing: Icon(Icons.check_circle, color: Colors.green)),
+            ListTile(title: Text('Session Manager'), trailing: Icon(Icons.check_circle, color: Colors.green)),
+            ListTile(title: Text('Advanced Timer'), trailing: Icon(Icons.check_circle, color: Colors.green)),
+            ListTile(title: Text('Adaptive Logic'), trailing: Icon(Icons.check_circle, color: Colors.green)),
+            ListTile(title: Text('Fair Play Engine'), trailing: Icon(Icons.check_circle, color: Colors.green)),
+            ListTile(title: Text('Recovery System'), trailing: Icon(Icons.check_circle, color: Colors.green)),
+          ],
+        ),
+      ),
+      PreviewItem(
+        id: 'fair_play_indicators',
+        name: 'Fair Play Indicators',
+        builder: (_) => const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              FairPlayIndicator(integrityScore: 1.0),
+              SizedBox(height: 8),
+              FairPlayIndicator(integrityScore: 0.7),
+              SizedBox(height: 8),
+              FairPlayIndicator(integrityScore: 0.3),
+              SizedBox(height: 8),
+              FairPlayIndicator(integrityScore: 1.0, isVetting: true),
+            ],
+          ),
+        ),
+      ),
+      PreviewItem(
+        id: 'feedback_overlays',
+        name: 'Feedback Overlays',
+        builder: (_) => Stack(
+          children: [
+            const QuestionEngineScreen(),
+            FeedbackOverlay(type: FeedbackType.correct, onFinished: () {}),
+          ],
+        ),
+      ),
+      PreviewItem(
+        id: 'option_states',
+        name: 'Option Tile States',
+        builder: (_) => Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              OptionTile(
+                option: const QuestionOption(id: '1', text: 'Idle Option'),
+                state: OptionState.idle,
+                onTap: () {},
+              ),
+              OptionTile(
+                option: const QuestionOption(id: '2', text: 'Selected Option'),
+                state: OptionState.selected,
+                onTap: () {},
+              ),
+              OptionTile(
+                option: const QuestionOption(id: '3', text: 'Correct Option'),
+                state: OptionState.correct,
+                onTap: () {},
+              ),
+              OptionTile(
+                option: const QuestionOption(id: '4', text: 'Incorrect Option'),
+                state: OptionState.incorrect,
+                onTap: () {},
+              ),
+            ],
+          ),
+        ),
+      ),
+      PreviewItem(
+        id: 'reward_feedback',
+        name: 'Reward Feedback',
+        builder: (_) => const Center(
+          child: RewardFeedback(amount: 100, label: 'XP'),
+        ),
+      ),
+    ],
+  );
+
+  static final _multiplayerCategory = PreviewCategory(
+    id: 'multiplayer',
+    name: 'Multiplayer & Matchmaking',
+    icon: Icons.people_outline_rounded,
+    items: [
+      PreviewItem(
+        id: 'searching_radar',
+        name: 'Searching Radar (Queued)',
+        builder: (_) => const ProviderScope(
+          child: SearchingForOpponent(),
+        ),
+      ),
+      PreviewItem(
+        id: 'match_ready',
+        name: 'Match Ready Dialog',
+        builder: (context) => Center(
+          child: SoteriaButton(
+            label: 'Trigger Match Found',
+            onPressed: () => showDialog(
+              context: context,
+              builder: (context) => MatchReadyDialog(
+                players: const [
+                  MatchPlayer(player: Player(id: '1', displayName: 'You', rank: 25)),
+                  MatchPlayer(player: Player(id: '2', displayName: 'CyberKnight', rank: 42)),
+                ],
+                onAccept: () => Navigator.pop(context),
+                onDecline: () => Navigator.pop(context),
+              ),
+            ),
+          ),
+        ),
+      ),
+      PreviewItem(
+        id: 'opponent_card',
+        name: 'Opponent Card',
+        builder: (_) => const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: OpponentCard(
+            player: Player(
+              id: '2',
+              displayName: 'NeonShadow',
+              rank: 12,
+              skillRating: 1100,
+              status: PlayerStatus.online,
+            ),
+            latency: 45,
+          ),
+        ),
+      ),
+      PreviewItem(
+        id: 'connection_status',
+        name: 'Connection Status Indicators',
+        builder: (_) => const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              ConnectionStatusIndicator(state: ConnectionState.connected),
+              SizedBox(height: 8),
+              ConnectionStatusIndicator(state: ConnectionState.connecting),
+              SizedBox(height: 8),
+              ConnectionStatusIndicator(state: ConnectionState.failed),
+            ],
+          ),
+        ),
+      ),
+      PreviewItem(
+        id: 'ready_check',
+        name: 'Ready Check Interface',
+        builder: (_) => ReadyCheckDialog(
+          session: GameSession(
+            sessionId: '1',
+            matchId: 'm1',
+            type: MatchType.oneVsOne,
+            status: SessionStatus.readyCheck,
+            createdAt: DateTime.now(),
+            players: const [
+              PlayerState(playerId: '1', displayName: 'You', isReady: true),
+              PlayerState(playerId: '2', displayName: 'Opponent', isReady: false),
+            ],
+          ),
+        ),
+      ),
+      PreviewItem(
+        id: 'match_countdown',
+        name: 'Match Countdown',
+        builder: (_) => MatchCountdownOverlay(count: 3, onFinished: () {}),
+      ),
+      PreviewItem(
+        id: 'round_transition',
+        name: 'Round Transition View',
+        builder: (_) => const RoundTransitionView(
+          roundCompleted: 1,
+          players: [
+            PlayerState(playerId: '1', displayName: 'You', score: 1200),
+            PlayerState(playerId: '2', displayName: 'Rival', score: 1150),
+          ],
+        ),
+      ),
+      PreviewItem(
+        id: 'sync_indicators',
+        name: 'Sync & Latency Tools',
+        builder: (_) => const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              ConnectionQualityIndicator(),
+              SizedBox(height: 16),
+              SyncStatusBanner(isRecovering: true, progress: 0.75),
+              SizedBox(height: 16),
+              LatencyDetailedOverlay(),
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
+
+  static final _progressionCategory = PreviewCategory(
+    id: 'progression',
+    name: 'Progression & Rewards',
+    icon: Icons.trending_up_rounded,
+    items: [
+      PreviewItem(
+        id: 'xp_bar',
+        name: 'XP Progress Bar',
+        builder: (_) => const Padding(
+          padding: EdgeInsets.all(24.0),
+          child: XPProgressBar(currentXP: 750, nextLevelXP: 1000),
+        ),
+      ),
+      PreviewItem(
+        id: 'level_badges',
+        name: 'Level Badges',
+        builder: (_) => const Padding(
+          padding: EdgeInsets.all(24.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              LevelBadge(level: 1),
+              LevelBadge(level: 12),
+              LevelBadge(level: 99),
+            ],
+          ),
+        ),
+      ),
+      PreviewItem(
+        id: 'score_card',
+        name: 'Score Card',
+        builder: (_) => const Padding(
+          padding: EdgeInsets.all(24.0),
+          child: ScoreCard(
+            label: 'Match Score',
+            value: 1250,
+            icon: Icons.emoji_events_rounded,
+          ),
+        ),
+      ),
+    ],
+  );
+
+  static final _visualShowcaseCategory = PreviewCategory(
+    id: 'visual_showcase',
+    name: 'Visual Showcase',
+    icon: Icons.vignette_outlined,
+    items: [
+      PreviewItem(
+        id: 'backgrounds',
+        name: 'Background Presets',
+        builder: (_) => const BackgroundShowcase(),
+      ),
+      PreviewItem(
+        id: 'ambient_lighting',
+        name: 'Ambient Glow Studio',
+        builder: (_) => const AmbientLightingShowcase(),
+      ),
+    ],
+  );
+
+  static final _componentStatesCategory = PreviewCategory(
+    id: 'component_states',
+    name: 'Component States',
+    icon: Icons.dynamic_feed_outlined,
+    items: [
+      PreviewItem(
+        id: 'button_states',
+        name: 'Button States Matrix',
+        builder: (_) => ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            _buildStateRow('Default', SoteriaButton(label: 'PRIMARY', onPressed: () {})),
+            _buildStateRow('Disabled', const SoteriaButton(label: 'DISABLED', onPressed: null)),
+            _buildStateRow('Loading', SoteriaButton(label: 'LOADING', isLoading: true, onPressed: () {})),
+            _buildStateRow('Outline', SoteriaButton(label: 'OUTLINED', type: SoteriaButtonType.outlined, onPressed: () {})),
+            _buildStateRow('Success', SoteriaButton(label: 'SUCCESS', type: SoteriaButtonType.success, onPressed: () {})),
+          ],
+        ),
+      ),
+    ],
+  );
+
+  static Widget _buildStateRow(String label, Widget child) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+          const SizedBox(height: 8),
+          child,
+        ],
+      ),
+    );
+  }
 
   static final _actionCategory = PreviewCategory(
     id: 'actions',
@@ -252,7 +730,7 @@ class PreviewRegistry {
         name: 'XP Progress Bar',
         builder: (_) => const Padding(
           padding: EdgeInsets.all(16.0),
-          child: XPProgressBar(progress: 0.65, level: 12),
+          child: SoteriaXPProgressBar(progress: 0.65, level: 12),
         ),
       ),
     ],

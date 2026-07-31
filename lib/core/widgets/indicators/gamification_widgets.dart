@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../design_system/design_system.dart';
 
-/// XPProgressBar shows user progress with a premium intelligent purple look.
-class XPProgressBar extends StatelessWidget {
-  const XPProgressBar({
+/// SoteriaXPProgressBar shows user progress with a premium intelligent purple look.
+class SoteriaXPProgressBar extends StatelessWidget {
+  const SoteriaXPProgressBar({
     super.key,
     required this.progress,
     required this.level,

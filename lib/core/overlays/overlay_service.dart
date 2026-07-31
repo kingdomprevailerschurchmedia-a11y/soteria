@@ -5,7 +5,7 @@ import 'overlay_state.dart';
 
 class OverlayService {
   OverlayService(this.ref);
-  final WidgetRef ref;
+  final Ref ref;
 
   void show(Widget child, {OverlayPriority priority = OverlayPriority.normal}) {
     ref.read(overlayControllerProvider.notifier).enqueue(
